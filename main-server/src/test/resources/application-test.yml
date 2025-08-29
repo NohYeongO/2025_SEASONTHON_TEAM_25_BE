@@ -1,0 +1,37 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 테스트마다 스키마 재생성
+    show-sql: true
+
+  # 테스트 데이터 자동 로딩 비활성화 (수동 제어로 변경)
+  sql:
+    init:
+      mode: always
+
+# JWT 테스트 설정
+jwt:
+  secret: dGVzdFNlY3JldEtleUZvckpXVFRva2VuVGVzdEVudmlyb25tZW50MTIzNDU2Nzg5MA==
+  access-token:
+    expiration: 3600000    # 1시간 (테스트용으로 길게)
+  refresh-token:
+    expiration: 7200000    # 2시간
+
+# 로깅 설정 (테스트 시 깔끔하게)
+logging:
+  level:
+    root: WARN
+    com.freedom: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.springframework.test: WARN
+    org.testcontainers: WARN
+    com.zaxxer.hikari: WARN
+    org.hibernate: WARN
+    org.springframework.transaction: WARN
+
+# 테스트 전용 설정
+test:
+  integration:
+    timeout: 30000  # 30초 타임아웃
+    cleanup-after-test: true
