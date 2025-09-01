@@ -1,5 +1,6 @@
 package com.freedom.saving.infra.fss;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,25 +11,28 @@ import reactor.core.publisher.Mono;
 public class FssSavingApiClient {
 
     private final WebClient webClient;
+    private final FssSavingApiProperties props;
 
-    @Value("${fss.base-url:https://finlife.fss.or.kr}")
-    private String baseUrl;
-
-    @Value("${fss.api-key}")
-    private String apiKey;
-
-    public FssSavingApiClient(WebClient.Builder builder) {
-        this.webClient = builder.build();
+    public FssSavingApiClient(@Qualifier("fssWebClient") WebClient webClient,
+                              FssSavingApiProperties props) {
+        this.webClient = webClient;
+        this.props = props;
     }
 
+    /**
+     * @param topFinGrpNo 020000: 은행
+     * @param pageNo    페이지 번호
+     */
     public Mono<FssSavingResponseDto> fetchSavings(String topFinGrpNo, int pageNo) {
-        String url = UriComponentsBuilder.fromHttpUrl(baseUrl + "/finlifeapi/savingProductsSearch.json")
-                .queryParam("auth", apiKey)           // 인증키
-                .queryParam("topFinGrpNo", topFinGrpNo) // 020000: 은행, 030300: 저축은행
+        String uri = UriComponentsBuilder.fromPath("/finlifeapi/savingProductsSearch.json")
+                .queryParam("auth", props.getApiKey())     // 인증키는 프로퍼티에서 주입
+                .queryParam("topFinGrpNo", topFinGrpNo)
                 .queryParam("pageNo", pageNo)
                 .toUriString();
 
-        return webClient.get().uri(url)
+        // 여기서는 상태 코드만 검사(4xx/5xx -> WebClientResponseException)
+        return webClient.get()
+                .uri(uri)
                 .retrieve()
                 .bodyToMono(FssSavingResponseDto.class);
     }
