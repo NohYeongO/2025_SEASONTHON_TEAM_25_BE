@@ -35,3 +35,7 @@ logging:
 fss:
   base-url: https://finlife.fss.or.kr
   api-key: ${FSS_API_KEY}
+
+jobs:
+  fss-sync:
+    enabled: true
