@@ -2,6 +2,9 @@ package com.freedom.common.exception;
 
 import com.freedom.common.exception.custom.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -155,5 +158,38 @@ public class GlobalExceptionHandler {
                 .status(ErrorCode.PRODUCT_NOT_FOUND.getStatus())
                 .body(ErrorResponse.of(ErrorCode.PRODUCT_NOT_FOUND));
 
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ValidationErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        log.warn("요청 파라미터 유효성 검증 실패: {}", e.getMessage());
+
+        // ConstraintViolation -> ValidationFieldError
+        java.util.List<ValidationFieldError> fieldErrors = new java.util.ArrayList<>();
+        java.util.Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+
+        for (ConstraintViolation<?> v : violations) {
+            String field = extractLastPathNode(v.getPropertyPath()); // "getProducts.page" -> "page"
+            Object rejected = v.getInvalidValue();
+            String code = v.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName(); // Min, NotBlank 등
+            String message = v.getMessage();
+
+            fieldErrors.add(ValidationFieldError.of(field, rejected, code, message));
+        }
+
+        ValidationErrorResponse body = ValidationErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors);
+        return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatus()).body(body);
+    }
+
+    /**
+     * 경로에서 마지막 노드만 추출: "getProducts.page" -> "page"
+     */
+    private String extractLastPathNode(Path path) {
+        String s = path.toString();
+        int idx = s.lastIndexOf('.');
+        if (idx >= 0 && idx + 1 < s.length()) {
+            return s.substring(idx + 1);
+        }
+        return s;
     }
 }
