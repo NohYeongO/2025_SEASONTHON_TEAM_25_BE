@@ -26,7 +26,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew :main-server:build -x test
+        run: ./gradlew :main-server:build
+        env:
+          NEWS_SERVICE_KEY: ${{ secrets.NEWS_SERVICE_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
@@ -64,3 +68,4 @@ jobs:
           app-name: 'financial-freedom'
           slot-name: 'Production'
           package: 'main-server-0.0.1-SNAPSHOT.jar'
+
