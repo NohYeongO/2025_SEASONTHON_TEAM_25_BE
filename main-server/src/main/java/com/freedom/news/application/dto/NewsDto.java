@@ -23,6 +23,7 @@ public class NewsDto {
     private String thumbnailUrl;
     private String aiSummary;
     private String plainTextContent;
+    private String ministerCode;
     
     public static NewsDto from(NewsArticle newsArticle) {
         return NewsDto.builder()
@@ -37,6 +38,7 @@ public class NewsDto {
                 .thumbnailUrl(newsArticle.getThumbnailUrl())
                 .aiSummary(newsArticle.getAiSummary())
                 .plainTextContent(newsArticle.getPlainTextContent())
+                .ministerCode(newsArticle.getMinisterCode())
                 .build();
     }
 }
