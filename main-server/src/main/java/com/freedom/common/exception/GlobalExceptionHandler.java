@@ -24,6 +24,12 @@ public class GlobalExceptionHandler {
         log.warn("사용자를 찾을 수 없음: {}", e.getMessage());
         return createErrorResponse(ErrorCode.USER_NOT_FOUND);
     }
+
+    @ExceptionHandler(NewsNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNewsNotFoundException(NewsNotFoundException e) {
+        log.warn("뉴스를 찾을 수 없음: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.NEWS_NOT_FOUND);
+    }
     
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateEmailException(DuplicateEmailException e) {
