@@ -15,6 +15,14 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
 
+# Redis 설정
+redis:
+  main:
+    host: ${REDIS_MAIN_HOST:localhost}
+    port: ${REDIS_MAIN_PORT:6379}
+    password: ${REDIS_MAIN_PASSWORD:Test}
+    ssl: true
+
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET:your-secret-key-must-be-at-least-256-bits-long-for-security}
@@ -22,6 +30,21 @@ jwt:
     expiration: 1800000    # 30분
   refresh-token:
     expiration: 1209600000 # 14일
+
+# 뉴스 API 설정
+news:
+  policy-briefing:
+    service-key: ${NEWS_SERVICE_KEY}
+
+  scheduler:
+    cron: "0 0 0,6,12,18 * * *"  # 매 6시간마다 실행 (0시, 6시, 12시, 18시)
+    zone: "Asia/Seoul"  # 한국 시간대
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+
+discord:
+  webhook-url: ${DISCORD_WEBHOOK_URL}
 
 # 로깅 설정
 logging:
