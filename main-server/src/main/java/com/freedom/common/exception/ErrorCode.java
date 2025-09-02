@@ -28,7 +28,10 @@ public enum ErrorCode {
     DUPLICATE_EMAIL("USER002", "이미 사용 중인 이메일입니다.", HttpStatus.CONFLICT),
     INVALID_PASSWORD("USER003", "비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     USER_WITHDRAWN("USER004", "탈퇴한 사용자입니다.", HttpStatus.FORBIDDEN),
-    USER_SUSPENDED("USER005", "정지된 사용자입니다.", HttpStatus.FORBIDDEN);
+    USER_SUSPENDED("USER005", "정지된 사용자입니다.", HttpStatus.FORBIDDEN),
+
+    // 상품/조회 에러
+    PRODUCT_NOT_FOUND("PRODUCT001","상품을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     
     private final String code;
     private final String message;
