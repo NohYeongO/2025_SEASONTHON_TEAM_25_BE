@@ -21,6 +21,7 @@ public class NewsDetailResponse {
     private String thumbnailUrl;
     private String aiSummary;
     private String plainTextContent;
+    private String ministerCode;
     private List<NewsContentBlockResponse> contentBlocks;
     
     public static NewsDetailResponse from(NewsDetailDto newsDetailDto) {
@@ -33,6 +34,7 @@ public class NewsDetailResponse {
                 .thumbnailUrl(newsDetailDto.getThumbnailUrl())
                 .aiSummary(newsDetailDto.getAiSummary())
                 .plainTextContent(newsDetailDto.getPlainTextContent())
+                .ministerCode(newsDetailDto.getMinisterCode())
                 .contentBlocks(newsDetailDto.getContentBlocks()
                         .stream()
                         .map(NewsContentBlockResponse::from)

@@ -23,6 +23,7 @@ public class NewsResponse {
     private String thumbnailUrl;
     private String aiSummary;
     private String plainTextContent;
+    private String ministerCode;
     
     public static NewsResponse from(NewsDto newsDto) {
         return NewsResponse.builder()
@@ -37,6 +38,7 @@ public class NewsResponse {
                 .thumbnailUrl(newsDto.getThumbnailUrl())
                 .aiSummary(newsDto.getAiSummary())
                 .plainTextContent(newsDto.getPlainTextContent())
+                .ministerCode(newsDto.getMinisterCode())
                 .build();
     }
 }

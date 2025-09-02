@@ -22,6 +22,7 @@ public class NewsDetailDto {
     private String thumbnailUrl;
     private String aiSummary;
     private String plainTextContent;
+    private String ministerCode;
     private List<NewsContentBlockDto> contentBlocks;
 
     public static NewsDetailDto from(NewsArticle newsArticle, List<NewsContentBlock> contentBlocks) {
@@ -39,6 +40,7 @@ public class NewsDetailDto {
                 .thumbnailUrl(newsArticle.getThumbnailUrl())
                 .aiSummary(newsArticle.getAiSummary())
                 .plainTextContent(newsArticle.getPlainTextContent())
+                .ministerCode(newsArticle.getMinisterCode())
                 .contentBlocks(contentBlockDtos)
                 .build();
     }
