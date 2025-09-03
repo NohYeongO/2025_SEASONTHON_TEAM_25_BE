@@ -36,19 +36,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         
         try {
-            // 토큰이 있고 유효한 Access Token인 경우에만 인증 처리
-            if (StringUtils.hasText(token) &&
-                jwtProvider.validateToken(token) && 
-                jwtProvider.isAccessToken(token)) {
+            if (StringUtils.hasText(token)) {
+                TokenValidationResult validationResult = jwtProvider.validateAccessToken(token);
                 
-                setAuthentication(token);
+                if (validationResult.isValid()) {
+                    // 유효한 토큰인 경우 인증 설정
+                    setAuthentication(token);
+                } else {
+                    // 토큰에 문제가 있는 경우 로그 기록 및 인증 정보 제거
+                    logTokenValidationFailure(request, validationResult);
+                    SecurityContextHolder.clearContext();
+                    
+                    // 토큰 만료의 경우 request에 속성 설정 (AuthenticationEntryPoint에서 사용)
+                    if (validationResult.isExpired()) {
+                        request.setAttribute("tokenExpired", true);
+                    }
+                }
             }
         } catch (Exception e) {
-            log.warn("JWT 토큰 처리 중 오류 발생: {}", e.getMessage());
-            // 토큰 오류 시 인증 없이 계속 진행 (Spring Security가 처리)
+            log.warn("JWT 토큰 처리 중 예상치 못한 오류 발생: {} - {}", request.getRequestURI(), e.getMessage());
+            SecurityContextHolder.clearContext();
         }
         
         filterChain.doFilter(request, response);
+    }
+    
+    private void logTokenValidationFailure(HttpServletRequest request, TokenValidationResult validationResult) {
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        
+        switch (validationResult.getStatus()) {
+            case EXPIRED -> log.warn("만료된 JWT 토큰으로 접근: {} {}", method, uri);
+            case INVALID -> log.warn("유효하지 않은 JWT 토큰으로 접근: {} {} - {}", method, uri, validationResult.getMessage());
+            case WRONG_TYPE -> log.warn("잘못된 토큰 타입으로 접근: {} {}", method, uri);
+        }
     }
     
     /**
