@@ -1,6 +1,8 @@
 package com.freedom.saving.infra.snapshot;
 
 import com.freedom.saving.domain.SavingProductSnapshot;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -38,4 +40,10 @@ public interface SavingProductSnapshotJpaRepository extends JpaRepository<Saving
             "set s.isLatest = false " +
             "where s.finCoNo = :finCoNo and s.finPrdtCd = :finPrdtCd and s.isLatest = true")
     int clearLatest(@Param("finCoNo") String finCoNo, @Param("finPrdtCd") String finPrdtCd);
+
+    /**
+     * 최신 스냅샷만 페이지 조회
+     * 정렬은 Pageable의 Sort를 따른다
+     */
+    Page<SavingProductSnapshot> findByIsLatestTrue(Pageable pageable);
 }
