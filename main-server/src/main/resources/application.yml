@@ -15,11 +15,13 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
 
-  # JSP 뷰 설정  
-  mvc:
-    view:
-      prefix: /WEB-INF/views/
-      suffix: .jsp
+# Thymeleaf 기본 설정은 starter가 자동 구성합니다. JSP 뷰 설정 제거
+  thymeleaf:
+    cache: true
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
   
   web:
     resources:
