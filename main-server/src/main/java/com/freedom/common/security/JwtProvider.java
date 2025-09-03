@@ -74,6 +74,27 @@ public class JwtProvider {
         }
     }
     
+    /**
+     * 토큰 상태를 세밀하게 검증하는 메서드
+     */
+    public TokenValidationResult validateAccessToken(String token) {
+        try {
+            parseClaims(token);
+            
+            // 토큰 타입 확인
+            if (!"ACCESS".equals(getTokenType(token))) {
+                return TokenValidationResult.wrongType();
+            }
+            
+            return TokenValidationResult.valid();
+            
+        } catch (TokenExpiredException e) {
+            return TokenValidationResult.expired();
+        } catch (TokenInvalidException | JwtException | IllegalArgumentException e) {
+            return TokenValidationResult.invalid(e.getMessage());
+        }
+    }
+    
     public boolean isAccessToken(String token) {
         try {
             return "ACCESS".equals(getTokenType(token));
