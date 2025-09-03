@@ -58,7 +58,7 @@ public class AdminAuthController {
         return ResponseEntity.ok(AdminLogoutResponse.success("/admin/login"));
     }
 
-    @PostMapping("/refresh")
+    @RequestMapping(value = "/refresh", method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<AdminLoginResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractCookie(request, "admin_refresh_token");
         if (refreshToken == null || refreshToken.isEmpty()) {
@@ -69,10 +69,17 @@ public class AdminAuthController {
         try {
             TokenDto tokenDto = authFacade.refreshTokens(refreshToken);
             setAuthCookies(response, tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+            String redirect = request.getParameter("redirect");
+            if (redirect != null && !redirect.isEmpty()) {
+                try {
+                    response.sendRedirect(redirect);
+                    return null; // 이미 응답 처리
+                } catch (Exception ignore) { }
+            }
             return ResponseEntity.ok(AdminLoginResponse.success(
-                    tokenDto.getAccessToken(),
-                    tokenDto.getUser().getEmail(),
-                    "/admin/dashboard"
+                tokenDto.getAccessToken(),
+                tokenDto.getUser().getEmail(),
+                "/admin/dashboard"
             ));
         } catch (Exception e) {
             clearAuthCookies(response);

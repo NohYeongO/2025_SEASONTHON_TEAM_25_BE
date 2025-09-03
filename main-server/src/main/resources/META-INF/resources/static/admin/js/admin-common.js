@@ -226,44 +226,46 @@ function handleAjaxError(xhr, status, error) {
         });
     }
 
+    // 모든 요청의 error 콜백을 래핑하여 401 시 자동 리프레시/재시도를 강제
+    // 전역 401 처리: 모든 AJAX 에러를 한 곳에서 가로채자
+    $(document).ajaxError(function(event, jqXHR, settings) {
+        if (jqXHR && jqXHR.status === 401) {
+            // 원 요청 보관 후, 리프레시 수행
+            const dfd = $.Deferred();
+            const retrySettings = $.extend(true, {}, settings);
+            queueRequest(retrySettings, dfd);
+
+            if (!isRefreshing) {
+                isRefreshing = true;
+                refreshToken()
+                    .done(function(resp) {
+                        if (resp && resp.accessToken) {
+                            localStorage.setItem('admin_token', resp.accessToken);
+                        }
+                        retryPending();
+                    })
+                    .fail(function() {
+                        pendingRequests = [];
+                        localStorage.removeItem('admin_token');
+                        setTimeout(function() { window.location.href = '/admin/login'; }, 500);
+                    })
+                    .always(function() { isRefreshing = false; });
+            }
+        }
+    });
+
     $.ajaxSetup({
         beforeSend: function(xhr) {
             const token = localStorage.getItem('admin_token');
             if (token) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + token);
             }
+            // AJAX 식별을 명시적으로 추가 (서버 엔트리포인트가 AJAX를 구분할 수 있게)
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         },
         error: function(xhr, status, error) {
-            const originalSettings = this;
-            // 인증 만료 처리: 401
-            if (xhr.status === 401) {
-                const dfd = $.Deferred();
-
-                queueRequest(originalSettings, dfd);
-
-                if (!isRefreshing) {
-                    isRefreshing = true;
-                    refreshToken()
-                        .done(function(resp) {
-                            // 서버는 새 access token을 쿠키에 설정함. 클라이언트 로컬 토큰도 갱신(선택)
-                            if (resp && resp.accessToken) {
-                                localStorage.setItem('admin_token', resp.accessToken);
-                            }
-                            retryPending();
-                        })
-                        .fail(function() {
-                            // 리프레시 실패: 세션 종료 처리
-                            pendingRequests = [];
-                            localStorage.removeItem('admin_token');
-                            showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
-                            setTimeout(function() { window.location.href = '/admin/login'; }, 1000);
-                        })
-                        .always(function() { isRefreshing = false; });
-                }
-
-                return dfd.promise();
-            }
-
+            // 401은 전역 ajaxError에서 처리하므로 여기서는 일반 에러만 처리
+            if (xhr && xhr.status === 401) return;
             handleAjaxError(xhr, status, error);
         }
     });
