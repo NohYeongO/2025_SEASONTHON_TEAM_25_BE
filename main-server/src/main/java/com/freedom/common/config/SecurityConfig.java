@@ -1,5 +1,6 @@
 package com.freedom.common.config;
 
+import com.freedom.common.security.JwtAuthenticationEntryPoint;
 import com.freedom.common.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,6 +42,10 @@ public class SecurityConfig {
                         ).permitAll()
                         // 나머지는 모두 인증 필요
                         .anyRequest().authenticated()
+                )
+                // 인증 실패 시 예외 처리
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 // JWT 필터 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
