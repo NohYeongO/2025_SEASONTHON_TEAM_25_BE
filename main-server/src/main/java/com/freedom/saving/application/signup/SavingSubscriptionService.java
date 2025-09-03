@@ -78,7 +78,7 @@ public class SavingSubscriptionService {
                 startServiceDate,
                 maturityServiceDate
         );
-        return new OpenSubscriptionResult(subscriptionId);
+        return new OpenSubscriptionResult(subscriptionId, startServiceDate, maturityServiceDate);
     }
 
     /**
