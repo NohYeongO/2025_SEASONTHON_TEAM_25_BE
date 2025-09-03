@@ -1,5 +1,6 @@
 package com.freedom.saving.api;
 
+import com.freedom.common.security.CustomUserPrincipal;
 import com.freedom.saving.api.subscription.OpenSubscriptionRequest;
 import com.freedom.saving.api.subscription.OpenSubscriptionResponse;
 import com.freedom.saving.application.signup.OpenSubscriptionCommand;
@@ -22,11 +23,11 @@ public class SavingSubscriptionCommandController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OpenSubscriptionResponse open(
-            @AuthenticationPrincipal(expression = "id") Long userId, // 커스텀 Principal의 id만 주입
+            @AuthenticationPrincipal CustomUserPrincipal principal, // 커스텀 Principal 객체 주입
             @RequestBody @Validated OpenSubscriptionRequest req
     ) {
         var cmd = new OpenSubscriptionCommand(
-                userId,
+                principal.getId(),
                 req.productSnapshotId(),
                 req.termMonths(),
                 req.reserveType(),      // 선택값. 미전달 시 서비스가 후보 1개면 자동, 2개 이상이면 예외

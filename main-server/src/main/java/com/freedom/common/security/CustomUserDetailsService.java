@@ -3,13 +3,10 @@ package com.freedom.common.security;
 import com.freedom.auth.domain.User;
 import com.freedom.auth.domain.service.FindUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             Long id = Long.valueOf(userId);
             User user = findUserService.findById(id);
             
-            return org.springframework.security.core.userdetails.User.builder()
-                    .username(user.getId().toString())
-                    .password(user.getPassword())
-                    .authorities(Collections.singletonList(
-                        new SimpleGrantedAuthority(user.getRole().getAuthority())
-                    ))
-                    .accountExpired(false)
-                    .accountLocked(user.isSuspended())
-                    .credentialsExpired(false)
-                    .disabled(user.isWithdrawn())
-                    .build();
+            return new CustomUserPrincipal(user);
                     
         } catch (NumberFormatException e) {
             throw new UsernameNotFoundException("Invalid user ID format: " + userId);
