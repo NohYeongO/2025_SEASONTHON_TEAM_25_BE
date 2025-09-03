@@ -45,6 +45,13 @@ public class AdminWebController {
         return "admin/quiz";
     }
 
+    @GetMapping("/quiz/{quizId}")
+    @Loggable("퀴즈 상세 페이지")
+    public String quizDetail(@PathVariable Long quizId, Model model) {
+        model.addAttribute("quizId", quizId);
+        return "admin/quiz-detail";
+    }
+
     @GetMapping("/users")
     @Loggable("사용자 관리 페이지")
     public String userManagement() {
