@@ -1,7 +1,7 @@
-package com.freedom.news.domain.service;
+package com.freedom.admin.news.domain.service;
 
 
-import com.freedom.news.application.dto.NewsArticleDto;
+import com.freedom.admin.news.application.dto.NewsArticleDto;
 import com.freedom.news.domain.entity.NewsArticle;
 import com.freedom.news.infra.repository.NewsArticleRepository;
 import lombok.RequiredArgsConstructor;

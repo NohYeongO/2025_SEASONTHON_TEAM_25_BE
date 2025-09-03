@@ -1,4 +1,4 @@
-package com.freedom.news.application.dto;
+package com.freedom.admin.news.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

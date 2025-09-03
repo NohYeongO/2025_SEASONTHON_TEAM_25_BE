@@ -1,7 +1,7 @@
-package com.freedom.news.domain.service;
+package com.freedom.admin.news.domain.service;
 
-import com.freedom.news.domain.model.ProcessedBlock;
-import com.freedom.news.domain.model.ProcessedNews;
+import com.freedom.admin.news.domain.model.ProcessedBlock;
+import com.freedom.admin.news.domain.model.ProcessedNews;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

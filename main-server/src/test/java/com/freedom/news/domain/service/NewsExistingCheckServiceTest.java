@@ -1,8 +1,9 @@
 package com.freedom.news.domain.service;
 
-import com.freedom.news.application.dto.ExistingNewsDto;
-import com.freedom.news.domain.result.NewsClassificationResult;
-import com.freedom.news.infra.client.response.NewsItem;
+import com.freedom.admin.news.domain.service.NewsExistingCheckService;
+import com.freedom.admin.news.application.dto.ExistingNewsDto;
+import com.freedom.admin.news.domain.result.NewsClassificationResult;
+import com.freedom.admin.news.infra.client.response.NewsItem;
 import com.freedom.news.infra.repository.NewsArticleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

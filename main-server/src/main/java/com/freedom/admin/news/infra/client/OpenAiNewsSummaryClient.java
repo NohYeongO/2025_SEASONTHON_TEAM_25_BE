@@ -1,6 +1,6 @@
-package com.freedom.news.infra.client;
+package com.freedom.admin.news.infra.client;
 
-import com.freedom.news.infra.client.response.SummaryResponse;
+import com.freedom.admin.news.infra.client.response.SummaryResponse;
 import com.openai.client.OpenAIClient;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.StructuredChatCompletionCreateParams;

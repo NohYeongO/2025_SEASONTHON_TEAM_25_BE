@@ -1,4 +1,4 @@
-package com.freedom.news.application.facade;
+package com.freedom.news.application;
 
 import com.freedom.news.api.response.NewsDetailResponse;
 import com.freedom.news.api.response.NewsResponse;

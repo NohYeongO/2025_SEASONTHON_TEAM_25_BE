@@ -1,7 +1,7 @@
-package com.freedom.news.application.schedule;
+package com.freedom.admin.news.application.schedule;
 
 import com.freedom.common.logging.Loggable;
-import com.freedom.news.application.facade.NewsFacade;
+import com.freedom.admin.news.application.facade.NewsFacade;
 import com.freedom.common.notification.DiscordWebhookClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;

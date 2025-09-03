@@ -1,4 +1,4 @@
-package com.freedom.news.domain.model;
+package com.freedom.admin.news.domain.model;
 
 import lombok.Builder;
 import lombok.Getter;

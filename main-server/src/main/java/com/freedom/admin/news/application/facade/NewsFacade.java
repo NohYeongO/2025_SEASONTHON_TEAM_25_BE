@@ -1,14 +1,14 @@
-package com.freedom.news.application.facade;
+package com.freedom.admin.news.application.facade;
 
-import com.freedom.news.application.dto.NewsArticleDto;
-import com.freedom.news.domain.result.NewsClassificationResult;
-import com.freedom.news.domain.model.ProcessedNews;
-import com.freedom.news.domain.service.NewsContentProcessingService;
-import com.freedom.news.domain.service.NewsExistingCheckService;
-import com.freedom.news.domain.service.NewsPersistenceService;
-import com.freedom.news.infra.client.OpenAiNewsSummaryClient;
-import com.freedom.news.infra.client.PolicyNewsClient;
-import com.freedom.news.infra.client.response.NewsItem;
+import com.freedom.admin.news.application.dto.NewsArticleDto;
+import com.freedom.admin.news.domain.result.NewsClassificationResult;
+import com.freedom.admin.news.domain.model.ProcessedNews;
+import com.freedom.admin.news.domain.service.NewsContentProcessingService;
+import com.freedom.admin.news.domain.service.NewsExistingCheckService;
+import com.freedom.admin.news.domain.service.NewsPersistenceService;
+import com.freedom.admin.news.infra.client.OpenAiNewsSummaryClient;
+import com.freedom.admin.news.infra.client.PolicyNewsClient;
+import com.freedom.admin.news.infra.client.response.NewsItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

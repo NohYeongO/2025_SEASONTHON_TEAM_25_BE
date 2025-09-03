@@ -1,6 +1,6 @@
-package com.freedom.news.domain.result;
+package com.freedom.admin.news.domain.result;
 
-import com.freedom.news.infra.client.response.NewsItem;
+import com.freedom.admin.news.infra.client.response.NewsItem;
 import lombok.Builder;
 import lombok.Getter;
 

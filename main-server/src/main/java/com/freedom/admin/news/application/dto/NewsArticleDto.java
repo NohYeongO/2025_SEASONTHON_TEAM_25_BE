@@ -1,11 +1,11 @@
-package com.freedom.news.application.dto;
+package com.freedom.admin.news.application.dto;
 
 import com.freedom.common.util.HashUtil;
-import com.freedom.news.domain.model.ProcessedBlock;
-import com.freedom.news.domain.model.ProcessedNews;
+import com.freedom.admin.news.domain.model.ProcessedBlock;
+import com.freedom.admin.news.domain.model.ProcessedNews;
 import com.freedom.news.domain.entity.NewsArticle;
 import com.freedom.news.domain.entity.NewsContentBlock;
-import com.freedom.news.infra.client.response.NewsItem;
+import com.freedom.admin.news.infra.client.response.NewsItem;
 import lombok.Builder;
 import lombok.Getter;
 

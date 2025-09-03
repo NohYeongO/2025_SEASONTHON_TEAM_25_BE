@@ -3,6 +3,7 @@ package com.freedom.news.application.facade;
 import com.freedom.common.exception.custom.NewsNotFoundException;
 import com.freedom.news.api.response.NewsDetailResponse;
 import com.freedom.news.api.response.NewsResponse;
+import com.freedom.news.application.NewsQueryAppService;
 import com.freedom.news.application.dto.NewsContentBlockDto;
 import com.freedom.news.application.dto.NewsDetailDto;
 import com.freedom.news.application.dto.NewsDto;

@@ -1,13 +1,12 @@
-package com.freedom.news.infra.client;
+package com.freedom.admin.news.infra.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.freedom.common.logging.Loggable;
-import com.freedom.news.infra.client.response.NewsItem;
+import com.freedom.admin.news.infra.client.response.NewsItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
