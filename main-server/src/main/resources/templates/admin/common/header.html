@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<header class="admin-header" th:fragment="header(pageTitle, pageIcon, addButton)">
+    <link rel="icon" href="/static/favicon.ico" />
+    <div class="header-content">
+        <h1 class="page-title">
+            <i th:classappend="${pageIcon}"></i><span th:text="${pageTitle}"></span>
+        </h1>
+        <div class="header-actions">
+            <span class="user-info">
+                <i class="fas fa-user"></i>Admin
+            </span>
+            <button class="btn logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>로그아웃
+            </button>
+        </div>
+    </div>
+</header>
+
+

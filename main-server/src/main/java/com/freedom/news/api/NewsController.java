@@ -2,7 +2,7 @@ package com.freedom.news.api;
 
 import com.freedom.news.api.response.NewsDetailResponse;
 import com.freedom.news.api.response.NewsResponse;
-import com.freedom.news.application.facade.NewsQueryAppService;
+import com.freedom.news.application.NewsQueryAppService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
