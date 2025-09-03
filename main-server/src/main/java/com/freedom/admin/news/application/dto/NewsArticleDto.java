@@ -38,6 +38,7 @@ public class NewsArticleDto {
     private String originalUrl;
     private List<ProcessedBlock> processedBlocks;
     private String aiSummary;
+    private Boolean economic;
 
     public static NewsArticleDto from(NewsItem newsItem, ProcessedNews processedNews) {
         return NewsArticleDto.builder()
@@ -62,6 +63,7 @@ public class NewsArticleDto {
                 .originalUrl(newsItem.getOriginalUrl())
                 .processedBlocks(processedNews.getProcessedBlocks())
                 .aiSummary(null)
+                .economic(false)
                 .build();
     }
     
@@ -101,6 +103,34 @@ public class NewsArticleDto {
                 .originalUrl(this.originalUrl)
                 .processedBlocks(this.processedBlocks)
                 .aiSummary(aiSummary)
+                .economic(this.economic)
+                .build();
+    }
+
+    public NewsArticleDto withClassifiedSummary(boolean economic, String aiSummary) {
+        return NewsArticleDto.builder()
+                .newsItemId(this.newsItemId)
+                .contentsStatus(this.contentsStatus)
+                .modifyId(this.modifyId)
+                .modifyDate(this.modifyDate)
+                .approveDate(this.approveDate)
+                .approverName(this.approverName)
+                .embargoDate(this.embargoDate)
+                .groupingCode(this.groupingCode)
+                .title(this.title)
+                .subTitle1(this.subTitle1)
+                .subTitle2(this.subTitle2)
+                .subTitle3(this.subTitle3)
+                .contentsType(this.contentsType)
+                .dataContents(this.dataContents)
+                .plainTextContent(this.plainTextContent)
+                .ministerCode(this.ministerCode)
+                .thumbnailUrl(this.thumbnailUrl)
+                .originalImgUrl(this.originalImgUrl)
+                .originalUrl(this.originalUrl)
+                .processedBlocks(this.processedBlocks)
+                .aiSummary(aiSummary)
+                .economic(economic)
                 .build();
     }
     
