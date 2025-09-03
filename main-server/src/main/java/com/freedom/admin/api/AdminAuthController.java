@@ -10,6 +10,7 @@ import com.freedom.auth.domain.UserRole;
 import com.freedom.common.exception.custom.InvalidPasswordException;
 import com.freedom.common.exception.custom.UserNotFoundException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,29 @@ public class AdminAuthController {
         return ResponseEntity.ok(AdminLogoutResponse.success("/admin/login"));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AdminLoginResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = extractCookie(request, "admin_refresh_token");
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(AdminLoginResponse.failure("리프레시 토큰이 없습니다."));
+        }
+
+        try {
+            TokenDto tokenDto = authFacade.refreshTokens(refreshToken);
+            setAuthCookies(response, tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+            return ResponseEntity.ok(AdminLoginResponse.success(
+                    tokenDto.getAccessToken(),
+                    tokenDto.getUser().getEmail(),
+                    "/admin/dashboard"
+            ));
+        } catch (Exception e) {
+            clearAuthCookies(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(AdminLoginResponse.failure("리프레시 토큰이 유효하지 않거나 만료되었습니다."));
+        }
+    }
+
     @GetMapping("/check")
     public ResponseEntity<AdminAuthCheckResponse> check() {
         return ResponseEntity.ok(AdminAuthCheckResponse.authenticated());
@@ -85,5 +109,15 @@ public class AdminAuthController {
         cookie.setPath("/admin");
         cookie.setMaxAge(maxAge);
         return cookie;
+    }
+
+    private String extractCookie(HttpServletRequest request, String name) {
+        if (request.getCookies() == null) return null;
+        for (Cookie cookie : request.getCookies()) {
+            if (name.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

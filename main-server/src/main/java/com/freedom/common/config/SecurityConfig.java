@@ -55,6 +55,7 @@ public class SecurityConfig {
                                 "/api/auth/refresh",
                                 "/admin/login",
                                 "/admin/api/auth/login",
+                                "/admin/api/auth/refresh",
                                 "/WEB-INF/views/**"   // forward되는 JSP 실경로
                         ).permitAll()
 

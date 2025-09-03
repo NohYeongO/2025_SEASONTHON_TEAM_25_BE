@@ -1,18 +1,11 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<header class="admin-header">
+<!DOCTYPE html>
+<header class="admin-header" th:fragment="header(pageTitle, pageIcon, addButton)">
     <link rel="icon" href="/static/favicon.ico" />
     <div class="header-content">
         <h1 class="page-title">
-            <i class="${pageIcon}"></i>${pageTitle}
+            <i th:classappend="${pageIcon}"></i><span th:text="${pageTitle}"></span>
         </h1>
         <div class="header-actions">
-            <c:if test="${not empty addButton}">
-                <button class="btn btn-primary me-3">
-                    <i class="fas fa-plus me-2"></i>${addButton}
-                </button>
-            </c:if>
             <span class="user-info">
                 <i class="fas fa-user"></i>Admin
             </span>
@@ -22,3 +15,5 @@
         </div>
     </div>
 </header>
+
+

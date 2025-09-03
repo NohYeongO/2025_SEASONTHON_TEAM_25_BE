@@ -199,15 +199,72 @@ function handleAjaxError(xhr, status, error) {
     showToast(message, 'error');
 }
 
-// 공통 AJAX 설정
-$.ajaxSetup({
-    beforeSend: function(xhr) {
-        const token = localStorage.getItem('admin_token');
-        if (token) {
-            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-        }
-    },
-    error: function(xhr, status, error) {
-        handleAjaxError(xhr, status, error);
+// 공통 AJAX 설정 + 자동 리프레시/재시도
+(function() {
+    let isRefreshing = false;
+    let pendingRequests = [];
+
+    function queueRequest(settings, deferred) {
+        pendingRequests.push({ settings: settings, deferred: deferred });
     }
-});
+
+    function retryPending() {
+        const queue = pendingRequests.slice();
+        pendingRequests = [];
+        queue.forEach(({ settings, deferred }) => {
+            $.ajax(settings)
+                .done(function(data, textStatus, jqXHR) { deferred.resolve(data, textStatus, jqXHR); })
+                .fail(function(jqXHR, textStatus, errorThrown) { deferred.reject(jqXHR, textStatus, errorThrown); });
+        });
+    }
+
+    function refreshToken() {
+        return $.ajax({
+            url: '/admin/api/auth/refresh',
+            method: 'POST',
+            // 쿠키 기반이므로 본문/헤더 불필요
+        });
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            const token = localStorage.getItem('admin_token');
+            if (token) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            }
+        },
+        error: function(xhr, status, error) {
+            const originalSettings = this;
+            // 인증 만료 처리: 401
+            if (xhr.status === 401) {
+                const dfd = $.Deferred();
+
+                queueRequest(originalSettings, dfd);
+
+                if (!isRefreshing) {
+                    isRefreshing = true;
+                    refreshToken()
+                        .done(function(resp) {
+                            // 서버는 새 access token을 쿠키에 설정함. 클라이언트 로컬 토큰도 갱신(선택)
+                            if (resp && resp.accessToken) {
+                                localStorage.setItem('admin_token', resp.accessToken);
+                            }
+                            retryPending();
+                        })
+                        .fail(function() {
+                            // 리프레시 실패: 세션 종료 처리
+                            pendingRequests = [];
+                            localStorage.removeItem('admin_token');
+                            showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
+                            setTimeout(function() { window.location.href = '/admin/login'; }, 1000);
+                        })
+                        .always(function() { isRefreshing = false; });
+                }
+
+                return dfd.promise();
+            }
+
+            handleAjaxError(xhr, status, error);
+        }
+    });
+})();
