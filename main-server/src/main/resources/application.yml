@@ -15,6 +15,16 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
 
+  # JSP 뷰 설정  
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+  
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/META-INF/resources/
+
 # Redis 설정
 redis:
   main:

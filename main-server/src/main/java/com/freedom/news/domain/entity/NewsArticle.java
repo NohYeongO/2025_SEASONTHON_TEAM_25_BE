@@ -1,7 +1,7 @@
 package com.freedom.news.domain.entity;
 
 import com.freedom.common.entity.BaseEntity;
-import com.freedom.news.application.dto.NewsArticleDto;
+import com.freedom.admin.news.application.dto.NewsArticleDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

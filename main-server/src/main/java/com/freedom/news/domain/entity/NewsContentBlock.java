@@ -1,7 +1,7 @@
 package com.freedom.news.domain.entity;
 
 import com.freedom.common.entity.BaseEntity;
-import com.freedom.news.domain.model.ProcessedBlock;
+import com.freedom.admin.news.domain.model.ProcessedBlock;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

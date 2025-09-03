@@ -1,6 +1,6 @@
 package com.freedom.news.infra.repository;
 
-import com.freedom.news.application.dto.ExistingNewsDto;
+import com.freedom.admin.news.application.dto.ExistingNewsDto;
 import com.freedom.news.domain.entity.NewsArticle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface NewsArticleRepository extends JpaRepository<NewsArticle, Long> {
 
     @Query("""
-        SELECT new com.freedom.news.application.dto.ExistingNewsDto(
+        SELECT new com.freedom.admin.news.application.dto.ExistingNewsDto(
             n.newsItemId, n.modifyId, n.contentHash
         )
         FROM NewsArticle n

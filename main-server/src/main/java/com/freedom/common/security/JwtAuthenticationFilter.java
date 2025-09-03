@@ -1,5 +1,6 @@
 package com.freedom.common.security;
 
+import com.freedom.common.logging.Loggable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -89,13 +90,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     
     /**
-     * 요청 헤더에서 JWT 토큰 추출
+     * 요청 헤더 또는 쿠키에서 JWT 토큰 추출
      */
     private String resolveToken(HttpServletRequest request) {
+        // 1. Authorization 헤더에서 토큰 추출 (API 요청용)
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(BEARER_PREFIX.length());
+        }
+        
+        // 2. 쿠키에서 토큰 추출 (관리자 웹 페이지용)
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("admin_access_token".equals(cookie.getName())) {
+                    String cookieToken = cookie.getValue();
+                    if (StringUtils.hasText(cookieToken)) {
+                        log.debug("쿠키에서 JWT 토큰 추출: {}", request.getRequestURI());
+                        return cookieToken;
+                    }
+                }
+            }
         }
         
         return null;

@@ -38,8 +38,16 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/sign-up",
                                 "/api/auth/login",
-                                "/api/auth/refresh"
+                                "/api/auth/refresh",
+                                // 관리자 로그인 페이지 및 정적 리소스
+                                "/admin/login",
+                                "/admin/api/auth/login",
+                                // JSP 파일 접근 허용
+                                "/WEB-INF/views/**",
+                                "/static/**"
                         ).permitAll()
+                        // 관리자 페이지는 ADMIN 역할 필요
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         // 나머지는 모두 인증 필요
                         .anyRequest().authenticated()
                 )
