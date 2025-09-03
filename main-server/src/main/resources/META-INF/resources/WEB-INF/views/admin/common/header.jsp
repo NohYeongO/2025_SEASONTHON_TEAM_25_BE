@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <header class="admin-header">
+    <link rel="icon" href="/static/favicon.ico" />
     <div class="header-content">
         <h1 class="page-title">
             <i class="${pageIcon}"></i>${pageTitle}

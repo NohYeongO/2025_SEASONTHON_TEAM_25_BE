@@ -2,7 +2,9 @@ package com.freedom.common.config;
 
 import com.freedom.common.security.JwtAuthenticationEntryPoint;
 import com.freedom.common.security.JwtAuthenticationFilter;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,20 +37,29 @@ public class SecurityConfig {
                 // URL별 인가 설정
                 .authorizeHttpRequests(auth -> auth
                         // 인증 불필요한 엔드포인트
+                        .dispatcherTypeMatchers(
+                                DispatcherType.FORWARD,
+                                DispatcherType.ERROR,
+                                DispatcherType.INCLUDE
+                        ).permitAll()
+
+                        // ★ 에러/파비콘/정적 리소스 허용
+                        .requestMatchers("/error", "/favicon.ico").permitAll()
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/assets/**","/css/**","/js/**","/images/**","/webjars/**","/static/**").permitAll()
+
+                        // ★ 공개 엔드포인트
                         .requestMatchers(
                                 "/api/auth/sign-up",
                                 "/api/auth/login",
                                 "/api/auth/refresh",
-                                // 관리자 로그인 페이지 및 정적 리소스
                                 "/admin/login",
                                 "/admin/api/auth/login",
-                                // JSP 파일 접근 허용
-                                "/WEB-INF/views/**",
-                                "/static/**"
+                                "/WEB-INF/views/**"   // forward되는 JSP 실경로
                         ).permitAll()
-                        // 관리자 페이지는 ADMIN 역할 필요
+
+                        // ★ 관리자 보호
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // 나머지는 모두 인증 필요
                         .anyRequest().authenticated()
                 )
                 // 인증 실패 시 예외 처리
