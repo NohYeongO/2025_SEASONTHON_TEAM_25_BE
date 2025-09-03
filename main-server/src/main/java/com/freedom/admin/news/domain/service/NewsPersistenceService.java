@@ -14,11 +14,11 @@ import java.util.List;
 public class NewsPersistenceService {
     private final NewsArticleRepository newsArticleRepository;
 
-    public void saveNewArticles(List<NewsArticleDto> newArticles) {
+    public List<NewsArticle> saveNewArticles(List<NewsArticleDto> newArticles) {
         List<NewsArticle> entities = newArticles.stream()
                 .map(NewsArticleDto::toEntity)
                 .toList();
-        newsArticleRepository.saveAll(entities);
+        return newsArticleRepository.saveAll(entities);
     }
 
     public void updateArticles(List<NewsArticleDto> updatedArticles) {

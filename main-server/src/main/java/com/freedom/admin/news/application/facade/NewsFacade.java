@@ -8,7 +8,9 @@ import com.freedom.admin.news.domain.service.NewsExistingCheckService;
 import com.freedom.admin.news.domain.service.NewsPersistenceService;
 import com.freedom.admin.news.infra.client.OpenAiNewsSummaryClient;
 import com.freedom.admin.news.infra.client.PolicyNewsClient;
+import com.freedom.admin.news.infra.client.response.ClassifiedSummaryResponse;
 import com.freedom.admin.news.infra.client.response.NewsItem;
+import com.freedom.news.domain.entity.NewsArticle;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ public class NewsFacade {
     private final NewsExistingCheckService newsExistingCheckService;
     private final OpenAiNewsSummaryClient openAiNewsSummaryClient;
     private final NewsPersistenceService newsPersistenceService;
+    private final com.freedom.admin.news.infra.client.NewsQuizGenerationClient quizClient;
+    private final com.freedom.quiz.application.QuizService quizService;
 
     @Transactional
     public void newsCollection() {
@@ -38,14 +42,30 @@ public class NewsFacade {
         List<NewsArticleDto> newArticles    = toArticlesDistinctById(classification.getNewNews());
         List<NewsArticleDto> updatedArticles = toArticlesDistinctById(classification.getUpdatedNews());
 
-        List<NewsArticleDto> summarizedNew     = summarizeAll(newArticles);
-        List<NewsArticleDto> summarizedUpdated = summarizeAll(updatedArticles);
+        List<NewsArticleDto> summarizedNew     = classifyAndSummarizeAll(newArticles);
+        List<NewsArticleDto> summarizedUpdated = classifyAndSummarizeAll(updatedArticles);
 
         if (!summarizedNew.isEmpty()) {
-            newsPersistenceService.saveNewArticles(summarizedNew);
+            List<NewsArticle> saved = newsPersistenceService.saveNewArticles(summarizedNew);
+            tryGenerateQuizzes(saved);
         }
         if (!summarizedUpdated.isEmpty()) {
             newsPersistenceService.updateArticles(summarizedUpdated);
+        }
+    }
+
+    private void tryGenerateQuizzes(List<NewsArticle> savedArticles) {
+        if (savedArticles == null || savedArticles.isEmpty()) return;
+        for (NewsArticle article : savedArticles) {
+            try {
+                // 퀴즈 생성 및 저장
+                quizService.generateAndSaveFromNews(
+                        article.getId(),
+                        article.getTitle(),
+                        article.getAiSummary(),
+                        article.getPlainTextContent()
+                );
+            } catch (Exception ignore) { }
         }
     }
 
@@ -66,10 +86,16 @@ public class NewsFacade {
                 .toList();
     }
 
-    private List<NewsArticleDto> summarizeAll(List<NewsArticleDto> articles) {
+    private List<NewsArticleDto> classifyAndSummarizeAll(List<NewsArticleDto> articles) {
         if (articles == null || articles.isEmpty()) return List.of();
         return articles.stream()
-                .map(a -> a.withAiSummary(openAiNewsSummaryClient.summarize(a.getPlainTextContent())))
+                .map(a -> {
+                    ClassifiedSummaryResponse r = openAiNewsSummaryClient.classifyAndSummarize(a.getPlainTextContent());
+                    boolean isEconomic = r != null && r.isEconomic();
+                    String summary = r != null ? r.getSummary() : null;
+                    return a.withClassifiedSummary(isEconomic, summary);
+                })
+                .filter(a -> Boolean.TRUE.equals(a.getEconomic()))
                 .toList();
     }
 
