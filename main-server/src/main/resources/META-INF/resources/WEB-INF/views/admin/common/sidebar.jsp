@@ -1,0 +1,16 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<nav class="admin-sidebar">
+    <div class="sidebar-header">
+        <h4><i class="fas fa-chart-line me-2"></i>파이낸셜 프리덤</h4>
+    </div>
+    <ul class="sidebar-menu">
+        <li><a href="/admin/dashboard" class="sidebar-link" data-page="dashboard">
+            <i class="fas fa-tachometer-alt"></i>메인 대시보드</a></li>
+        <li><a href="/admin/news" class="sidebar-link" data-page="news">
+            <i class="fas fa-newspaper"></i>뉴스 관리</a></li>
+        <li><a href="/admin/quiz" class="sidebar-link" data-page="quiz">
+            <i class="fas fa-question-circle"></i>퀴즈 관리</a></li>
+        <li><a href="/admin/users" class="sidebar-link" data-page="users">
+            <i class="fas fa-users"></i>사용자 관리</a></li>
+    </ul>
+</nav>
