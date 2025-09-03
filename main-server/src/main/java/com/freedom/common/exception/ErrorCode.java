@@ -33,6 +33,9 @@ public enum ErrorCode {
     // 상품/조회 에러
     PRODUCT_NOT_FOUND("PRODUCT001","상품을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     
+    // 뉴스 에러
+    NEWS_NOT_FOUND("NEWS001", "뉴스를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+
     private final String code;
     private final String message;
     private final HttpStatus status;

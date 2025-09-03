@@ -27,6 +27,12 @@ public class GlobalExceptionHandler {
         log.warn("사용자를 찾을 수 없음: {}", e.getMessage());
         return createErrorResponse(ErrorCode.USER_NOT_FOUND);
     }
+  
+    @ExceptionHandler(NewsNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNewsNotFoundException(NewsNotFoundException e) {
+        log.warn("뉴스를 찾을 수 없음: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.NEWS_NOT_FOUND);
+    }
 
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateEmailException(DuplicateEmailException e) {
@@ -138,12 +144,6 @@ public class GlobalExceptionHandler {
         return createErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception e, HttpServletRequest request) {
-        log.error("예상하지 못한 예외 발생: {} {}", request.getMethod(), request.getRequestURI(), e);
-        return createErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
-    }
-
     private ResponseEntity<ErrorResponse> createErrorResponse(ErrorCode errorCode) {
         ErrorResponse errorResponse = ErrorResponse.of(errorCode);
         return ResponseEntity
@@ -191,5 +191,11 @@ public class GlobalExceptionHandler {
             return s.substring(idx + 1);
         }
         return s;
+    }
+  
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception e, HttpServletRequest request) {
+        log.error("예상하지 못한 예외 발생: {} {}", request.getMethod(), request.getRequestURI(), e);
+        return createErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 }
