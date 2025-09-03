@@ -30,6 +30,9 @@ public enum ErrorCode {
     USER_WITHDRAWN("USER004", "탈퇴한 사용자입니다.", HttpStatus.FORBIDDEN),
     USER_SUSPENDED("USER005", "정지된 사용자입니다.", HttpStatus.FORBIDDEN),
 
+    // 상품/조회 에러
+    PRODUCT_NOT_FOUND("PRODUCT001","상품을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    
     // 뉴스 에러
     NEWS_NOT_FOUND("NEWS001", "뉴스를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 

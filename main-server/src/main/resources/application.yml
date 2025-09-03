@@ -72,3 +72,7 @@ fss:
 jobs:
   fss-sync:
     enabled: true
+
+app:
+  fss:
+    bootstrap-enabled: false   #  켜두면 기동 시 1회 실행
