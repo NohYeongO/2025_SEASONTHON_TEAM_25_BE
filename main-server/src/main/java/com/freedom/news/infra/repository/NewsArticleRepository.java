@@ -30,6 +30,17 @@ public interface NewsArticleRepository extends JpaRepository<NewsArticle, Long> 
             @Param("endOfDay") LocalDateTime endOfDay
     );
 
+    @Query("""
+        SELECT new com.freedom.admin.news.application.dto.ExistingNewsDto(
+            n.newsItemId, n.modifyId, n.contentHash
+        )
+        FROM NewsArticle n
+        WHERE n.newsItemId IN :newsItemIds
+    """)
+    List<ExistingNewsDto> findNewsItemIdAndModifyIdAndHashByNewsItemIdIn(
+            @Param("newsItemIds") List<String> newsItemIds
+    );
+
 
     Optional<NewsArticle> findByNewsItemId(String newsItemId);
     
