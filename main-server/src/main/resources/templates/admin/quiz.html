@@ -14,6 +14,13 @@
     <div class="admin-content">
         <div th:replace="~{admin/common/header :: header('퀴즈 관리', 'fas fa-question-circle', '퀴즈 추가')}"></div>
         <main class="page-content">
+            <div class="row mb-3">
+                <div class="col-md-12 text-end">
+                    <a href="/admin/quiz/create" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>퀴즈 추가
+                    </a>
+                </div>
+            </div>
             <div class="row" id="quizCardContainer">
                 <div class="col-12 text-center text-muted py-4">퀴즈 데이터를 불러오는 중입니다...</div>
             </div>
@@ -81,5 +88,3 @@
 </script>
 </body>
 </html>
-
-
