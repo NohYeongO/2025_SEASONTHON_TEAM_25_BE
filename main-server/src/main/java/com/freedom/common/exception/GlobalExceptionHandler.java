@@ -166,6 +166,13 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(CharacterAlreadyCreatedException.class)
+    public ResponseEntity<ErrorResponse> handleCharacterAlreadyCreated(CharacterAlreadyCreatedException e) {
+        return ResponseEntity
+                .status(ErrorCode.CHARACTER_ALREADY_CREATED.getStatus())
+                .body(ErrorResponse.of(ErrorCode.CHARACTER_ALREADY_CREATED));
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ValidationErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
         log.warn("요청 파라미터 유효성 검증 실패: {}", e.getMessage());

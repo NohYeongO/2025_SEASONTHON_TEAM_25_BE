@@ -4,6 +4,8 @@ import com.freedom.auth.domain.User;
 import com.freedom.auth.infra.UserJpaRepository;
 import com.freedom.character.infra.CharacterRepository;
 import com.freedom.character.domain.Character;
+import com.freedom.common.exception.custom.CharacterAlreadyCreatedException;
+import com.freedom.common.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +32,13 @@ public class OnboardingService {
         // 1) 유저 검증
         User user = userJpaRepository.findById(userId).orElse(null);
         if (user == null) {
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+            throw new UserNotFoundException("userId=" + userId);
         }
 
         // 2) 중복 생성 방지
         boolean alreadyExists = characterRepository.existsByUserId(userId);
         if (alreadyExists) {
-            throw new IllegalStateException("이미 캐릭터가 생성되었습니다.");
+            throw new CharacterAlreadyCreatedException("characterName=" + characterName);
         }
 
         // 3) 캐릭터 저장
