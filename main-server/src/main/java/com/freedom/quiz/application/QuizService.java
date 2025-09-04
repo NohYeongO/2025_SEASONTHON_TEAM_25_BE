@@ -22,61 +22,66 @@ public class QuizService {
     private final NewsQuizGenerationClient quizClient;
 
     @Transactional
-    public void generateAndSaveFromNews(Long newsArticleId, String title, String summary, String plainText) {
+    public void generateAndSaveFromNews(Long newsArticleId, String title, String summary, String plainText, String category) {
         NewsQuizGenerationClient.QuizPack pack = quizClient.generateQuizzes(title, summary, plainText);
         if (pack == null) return;
+
         List<Quiz> toSave = new ArrayList<>();
-        String category = pack.category() != null ? pack.category() : "뉴스 기사";
+
+        // ========= OX =========
         if (pack.ox() != null) {
-            NewsQuizGenerationClient.OxQuiz ox = pack.ox();
-            boolean originalAnswer = ox.answer();
-            boolean swap = ThreadLocalRandom.current().nextBoolean();
-            boolean finalAnswer = originalAnswer;
-            String finalQuestion = ox.question();
-            if (swap) {
-                finalAnswer = !originalAnswer;
-                finalQuestion = "아닌가요? " + finalQuestion;
-            }
+            var ox = pack.ox();
+
             Quiz entity = Quiz.builder()
                     .type(QuizType.OX)
                     .difficulty(QuizDifficulty.MEDIUM)
                     .category(category)
                     .newsArticleId(newsArticleId)
-                    .question(finalQuestion)
-                    .explanation(ox.explanation())
-                    .oxAnswer(finalAnswer)
+                    .question(ox.question().trim())
+                    .explanation(ox.explanation().trim())
+                    .oxAnswer(ox.answer())
                     .build();
             toSave.add(entity);
         }
 
-        // 4지선다
+        // ========= 4지선다 =========
         if (pack.mcq() != null && pack.mcq().options() != null && pack.mcq().options().size() == 4) {
-            NewsQuizGenerationClient.McqQuiz mcq = pack.mcq();
+            var mcq = pack.mcq();
+
             List<NewsQuizGenerationClient.McqOption> options = new ArrayList<>(mcq.options());
             Collections.shuffle(options, ThreadLocalRandom.current());
-            int correctIdx = 0;
+
+            // correct=true 개수 검증
+            int correctCount = 0;
+            int correctIdx1Based = 0;
             for (int i = 0; i < 4; i++) {
-                if (options.get(i).correct()) { correctIdx = i + 1; break; }
+                if (Boolean.TRUE.equals(options.get(i).correct())) {
+                    correctCount++;
+                    correctIdx1Based = i + 1;
+                }
             }
-            Quiz entity = Quiz.builder()
-                    .type(QuizType.MCQ)
-                    .difficulty(QuizDifficulty.MEDIUM)
-                    .category(category)
-                    .newsArticleId(newsArticleId)
-                    .question(mcq.question())
-                    .explanation(mcq.explanation())
-                    .mcqOption1(options.get(0).text())
-                    .mcqOption2(options.get(1).text())
-                    .mcqOption3(options.get(2).text())
-                    .mcqOption4(options.get(3).text())
-                    .mcqCorrectIndex(correctIdx == 0 ? 1 : correctIdx)
-                    .build();
-            toSave.add(entity);
+
+            if (correctCount == 1) { // 답이 정확히 1개일 때만 저장
+                Quiz entity = Quiz.builder()
+                        .type(QuizType.MCQ)
+                        .difficulty(QuizDifficulty.MEDIUM)
+                        .category(category)
+                        .newsArticleId(newsArticleId)
+                        .question(mcq.question().trim())
+                        .explanation(mcq.explanation().trim())
+                        .mcqOption1(options.get(0).text())
+                        .mcqOption2(options.get(1).text())
+                        .mcqOption3(options.get(2).text())
+                        .mcqOption4(options.get(3).text())
+                        .mcqCorrectIndex(correctIdx1Based)
+                        .build();
+                toSave.add(entity);
+            }
         }
 
-        if (toSave.isEmpty()) return;
-        quizRepository.saveAll(toSave);
+        if (!toSave.isEmpty()) {
+            quizRepository.saveAll(toSave);
+        }
     }
+
 }
-
-
