@@ -6,6 +6,7 @@ import com.freedom.character.infra.CharacterRepository;
 import com.freedom.character.domain.Character;
 import com.freedom.common.exception.custom.CharacterAlreadyCreatedException;
 import com.freedom.common.exception.custom.UserNotFoundException;
+import com.freedom.wallet.application.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class OnboardingService {
 
     private final UserJpaRepository userJpaRepository;
     private final CharacterRepository characterRepository;
+    private final WalletService walletService;
 
     /**
      * 캐릭터 생성(최초 1회)
@@ -51,6 +53,9 @@ public class OnboardingService {
 
         // 4) 유저 플래그 업데이트(도메인 메서드 사용)
         user.hasCharacterCreated();
+
+        // 5) 지갑 생성
+        walletService.createWallet(userId);
 
         return characterId;
     }
