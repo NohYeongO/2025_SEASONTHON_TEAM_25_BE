@@ -88,6 +88,50 @@ public class GlobalExceptionHandler {
         return createErrorResponse(ErrorCode.REFRESH_TOKEN_INVALID);
     }
 
+    // ===== saving mapping =====
+    @ExceptionHandler(SavingExceptions.SavingSubscriptionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSavingSubscriptionNotFound() {
+        return createErrorResponse(ErrorCode.SAVING_SUBSCRIPTION_NOT_FOUND);
+    }
+
+    @ExceptionHandler(SavingExceptions.SavingSubscriptionInvalidStateException.class)
+    public ResponseEntity<ErrorResponse> handleSavingSubscriptionInvalidState(SavingExceptions.SavingSubscriptionInvalidStateException e) {
+        log.warn("적금 상태 오류: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.SAVING_SUBSCRIPTION_INVALID_STATE);
+    }
+
+    @ExceptionHandler(SavingExceptions.SavingNoNextPlannedPaymentException.class)
+    public ResponseEntity<ErrorResponse> handleSavingNoNextPlannedPayment() {
+        return createErrorResponse(ErrorCode.SAVING_NO_NEXT_PLANNED_PAYMENT);
+    }
+
+    @ExceptionHandler(SavingExceptions.SavingInvalidPaymentAmountException.class)
+    public ResponseEntity<ErrorResponse> handleSavingInvalidPaymentAmount() {
+        return createErrorResponse(ErrorCode.SAVING_INVALID_PAYMENT_AMOUNT);
+    }
+
+    @ExceptionHandler(SavingExceptions.SavingInvalidDatesException.class)
+    public ResponseEntity<ErrorResponse> handleSavingInvalidDates() {
+        return createErrorResponse(ErrorCode.SAVING_INVALID_DATES);
+    }
+
+    @ExceptionHandler(SavingExceptions.SavingPaymentInvalidParamsException.class)
+    public ResponseEntity<ErrorResponse> handleSavingPaymentInvalidParams(SavingExceptions.SavingPaymentInvalidParamsException e) {
+        log.warn("적금 납입 파라미터 오류: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.SAVING_PAYMENT_INVALID_PARAMS);
+    }
+
+    @ExceptionHandler(SavingExceptions.SavingPolicyInvalidException.class)
+    public ResponseEntity<ErrorResponse> handleSavingPolicyInvalid(SavingExceptions.SavingPolicyInvalidException e) {
+        log.warn("적금 정책 파라미터 오류: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.SAVING_POLICY_INVALID);
+    }
+
+    @ExceptionHandler(SavingExceptions.SavingSnapshotIdentifiersInvalidException.class)
+    public ResponseEntity<ErrorResponse> handleSavingSnapshotIdentifiersInvalid() {
+        return createErrorResponse(ErrorCode.SAVING_SNAPSHOT_IDENTIFIERS_INVALID);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.warn("유효성 검증 실패: {}", e.getBindingResult().getAllErrors());

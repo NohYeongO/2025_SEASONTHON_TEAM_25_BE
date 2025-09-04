@@ -1,5 +1,6 @@
 package com.freedom.saving.api;
 
+import com.freedom.common.exception.custom.SavingExceptions;
 import com.freedom.saving.application.SavingProductReadService;
 import com.freedom.saving.application.read.SavingProductDetail;
 import com.freedom.saving.application.read.SavingProductListItem;
@@ -33,11 +34,11 @@ public class SavingProductReadController {
 
         // 아직 SAVING만 지원하므로 방어적으로 검증
         if (!"SAVING".equalsIgnoreCase(type)) {
-            throw new IllegalArgumentException("지원하지 않는 type 값입니다. (허용: SAVING)");
+            throw new SavingExceptions.SavingPolicyInvalidException("지원하지 않는 type 값입니다. (허용: SAVING)");
         }
         // popular 외 값이 들어오면 현재 동작과 다른 결과가 나올 수 있어 방어적으로 검증
         if (!"popular".equalsIgnoreCase(sort)) {
-            throw new IllegalArgumentException("지원하지 않는 sort 값입니다. (허용: popular)");
+            throw new SavingExceptions.SavingPolicyInvalidException("지원하지 않는 sort 값입니다. (허용: popular)");
         }
         // 서비스는 인기순(임시) = fetchedAt DESC 정렬로 페이지 결과 제공
         return readService.getPopularSavingProducts(page, size);

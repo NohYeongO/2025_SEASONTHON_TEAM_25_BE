@@ -42,7 +42,17 @@ public enum ErrorCode {
 
     // 캐릭터 생성 에러
     CHARACTER_ALREADY_CREATED("CHAR001", "이미 캐릭터가 생성되었습니다.", HttpStatus.CONFLICT),
-    CHARACTER_NAME_INVALID   ("CHAR002", "캐릭터 이름이 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+    CHARACTER_NAME_INVALID   ("CHAR002", "캐릭터 이름이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+
+    // 적금 에러
+    SAVING_SUBSCRIPTION_NOT_FOUND("SAV001", "적금 구독을 찾을 수 없거나 권한이 없습니다.", HttpStatus.NOT_FOUND),
+    SAVING_SUBSCRIPTION_INVALID_STATE("SAV002", "해당 상태에선 수행할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    SAVING_NO_NEXT_PLANNED_PAYMENT("SAV003", "다음 납입 계획이 없습니다.", HttpStatus.BAD_REQUEST),
+    SAVING_INVALID_PAYMENT_AMOUNT("SAV004", "납입 금액이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    SAVING_INVALID_DATES("SAV005", "시작일/만기일이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    SAVING_PAYMENT_INVALID_PARAMS("SAV006", "납입 파라미터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    SAVING_POLICY_INVALID("SAV007", "정책 파라미터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    SAVING_SNAPSHOT_IDENTIFIERS_INVALID("SAV008", "스냅샷 식별자가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

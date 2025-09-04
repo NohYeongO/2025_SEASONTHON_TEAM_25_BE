@@ -1,5 +1,6 @@
 package com.freedom.saving.domain.subscription;
 
+import com.freedom.common.exception.custom.SavingExceptions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -25,7 +26,7 @@ public class ServiceDates {
 
     public ServiceDates(LocalDate startDate, LocalDate maturityDate) {
         if (startDate == null || maturityDate == null || maturityDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("시작일/만기일이 유효하지 않습니다.");
+            throw new SavingExceptions.SavingInvalidDatesException();
         }
         this.startDate = startDate;
         this.maturityDate = maturityDate;
