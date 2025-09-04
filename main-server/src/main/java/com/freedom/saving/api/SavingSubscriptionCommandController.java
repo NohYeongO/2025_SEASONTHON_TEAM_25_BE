@@ -3,6 +3,7 @@ package com.freedom.saving.api;
 import com.freedom.common.security.CustomUserPrincipal;
 import com.freedom.saving.api.subscription.OpenSubscriptionRequest;
 import com.freedom.saving.api.subscription.OpenSubscriptionResponse;
+import com.freedom.saving.application.SavingSubscriptionCommandService;
 import com.freedom.saving.application.signup.OpenSubscriptionCommand;
 import com.freedom.saving.application.signup.OpenSubscriptionResult;
 import com.freedom.saving.application.signup.SavingSubscriptionService;
@@ -19,19 +20,20 @@ import org.springframework.web.bind.annotation.*;
 public class SavingSubscriptionCommandController {
 
     private final SavingSubscriptionService service;
+    private final SavingSubscriptionCommandService commandService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OpenSubscriptionResponse open(
-            @AuthenticationPrincipal CustomUserPrincipal principal, // 커스텀 Principal 객체 주입
+            @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestBody @Validated OpenSubscriptionRequest req
     ) {
         var cmd = new OpenSubscriptionCommand(
                 principal.getId(),
                 req.productSnapshotId(),
                 req.termMonths(),
-                req.reserveType(),      // 선택값. 미전달 시 서비스가 후보 1개면 자동, 2개 이상이면 예외
-                req.autoDebitAmount()   // 정액식(S)일 때만 서비스에서 필수 검증
+                req.reserveType(),
+                req.autoDebitAmount()
         );
         OpenSubscriptionResult r = service.open(cmd);
         return new OpenSubscriptionResponse(
@@ -39,5 +41,14 @@ public class SavingSubscriptionCommandController {
                 r.startDate(),
                 r.maturityDate()
         );
+    }
+
+    @DeleteMapping("/{subscriptionId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancel(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @PathVariable Long subscriptionId
+    ) {
+        commandService.cancelByUser(principal.getId(), subscriptionId);
     }
 }
