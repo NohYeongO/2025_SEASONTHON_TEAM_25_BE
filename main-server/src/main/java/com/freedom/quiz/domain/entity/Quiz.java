@@ -33,7 +33,7 @@ public class Quiz extends BaseEntity {
     @Column(name = "question", length = 500, nullable = false)
     private String question;
 
-    @Column(name = "explanation", length = 1000)
+    @Column(name = "explanation", length = 500)
     private String explanation;
 
     // OX
