@@ -94,9 +94,11 @@ public class SavingProductReadService {
         detail.setProductName(s.getFinPrdtNm());
         detail.setBankName(s.getKorCoNm());
         detail.setJoinWay(s.getJoinWay());
+        detail.setMaturityInterest(s.getMtrtInt()); // 만기 후 이자율
         detail.setSpecialCondition(s.getSpclCnd());
         detail.setJoinDeny(s.getJoinDeny());
         detail.setJoinMember(s.getJoinMember());
+        detail.setMaxLimit(s.getMaxLimit()); // 최고한도
         detail.setEtcNote(s.getEtcNote());
         detail.setFetchedAt(s.getFetchedAt());
 

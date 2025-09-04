@@ -14,6 +14,16 @@
     <div class="admin-content">
         <div th:replace="~{admin/common/header :: header('퀴즈 상세', 'fas fa-question-circle', null)}"></div>
         <main class="page-content">
+            <div class="row mb-3">
+                <div class="col-md-12 text-end">
+                    <a href="/admin/quiz" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>목록으로 돌아가기
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick="deleteQuiz()">
+                        <i class="fas fa-trash me-1"></i>삭제
+                    </button>
+                </div>
+            </div>
             <div class="container">
                 <div id="cardContainer" class="card shadow-sm">
                     <div class="card-body">
@@ -82,6 +92,21 @@
         }
     }
     function escapeHtml(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
+    
+    function deleteQuiz(){
+        if(!confirm('정말 이 퀴즈를 삭제하시겠습니까?')) return;
+        $.ajax({ 
+            url: '/admin/api/quiz/'+quizId, 
+            method: 'DELETE', 
+            success: function(){ 
+                showToast('퀴즈가 삭제되었습니다','success'); 
+                setTimeout(() => window.location.href = '/admin/quiz', 1500);
+            }, 
+            error: function(){ 
+                showToast('퀴즈 삭제 실패','error'); 
+            }
+        });
+    }
     /*]]>*/
 </script>
 </body>

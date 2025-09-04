@@ -53,17 +53,25 @@ public class OpenAiNewsSummaryClient {
 
     public ClassifiedSummaryResponse classifyAndSummarize(String plainText) {
         String prompt = """
-            너는 한국 경제 뉴스 필터 및 요약기이다. 아래 본문이 '경제 관련'인지 먼저 판별하고,
-            경제 관련이라면 1문장 요약을, 아니라면 이유를 제시하라.
-
-            [기준]
-            - 경제 관련: 금리/물가/환율/주식/채권/부동산/정책/세금/고용/산업/기업실적/무역/금융 등 경제 활동과 직접 관련
-            - 비경제: 사건사고/연예/스포츠/일상/순수 과학기술 동향 등 직접 경제성과가 불분명한 경우
-
+            너는 한국 '경제 뉴스 분류/요약기'다. 아래 [본문]만 사용하고, 외부 지식·추론·상상·가정은 금지한다.
+            
+            [판단 대상(본문에 직접 언급이 있을 때만 true)]
+            - 청년 정책: 청년 대상 정책/지원/예산/세제/고용 프로그램 (청년 =대상 정책 필수 확인)
+            - 금융: 금리/대출/예금/은행/주식·채권/환율/금융감독
+            - 거시경제: 물가/성장률/GDP/고용지표/무역/산업생산/기준금리/재정·통화정책
+            ※ 위에 직접 해당하지 않으면 false
+            
+            [요약 규칙 - 중요]
+            - is_economic=true일 때만 summary 작성
+            - summary는 1~2문장, 총 150자 이내
+            - 본문에 없는 사실·숫자·고유명사 생성 금지(추가 정보·배경 지식 금지)
+            - 가능하면 본문 표현을 그대로 사용하고 군더더기 문구 제거
+            - 150자를 넘기면 불필요한 수식어를 삭제해 150자 이내로 축약
+            
             [출력(JSON만)]
-            {"is_economic": true|false, "summary": "경제 기사면 1문장 요약, 아니면 빈 문자열", "reason": "비경제 판단 사유(선택)"}
-
-            [뉴스 본문]
+            {"is_economic": true|false, "summary": "경제 기사면 1~2문장 150자 이내 요약, 아니면 빈 문자열", "reason": "비경제/비해당 사유(선택)"}
+            
+            [본문]
             %s
             """.formatted(plainText);
 
@@ -83,9 +91,6 @@ public class OpenAiNewsSummaryClient {
                 .stream()
                 .flatMap(choice -> choice.message().content().stream())
                 .findFirst()
-                .orElseGet(() -> {
-                    ClassifiedSummaryResponse r = new ClassifiedSummaryResponse();
-                    return r;
-                });
+                .orElseGet(ClassifiedSummaryResponse::new);
     }
 }

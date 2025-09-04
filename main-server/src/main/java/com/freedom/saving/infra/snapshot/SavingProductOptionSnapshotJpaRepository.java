@@ -26,4 +26,28 @@ public interface SavingProductOptionSnapshotJpaRepository extends JpaRepository<
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from SavingProductOptionSnapshot o where o.productSnapshotId = :productSnapshotId")
     int deleteAllByProductSnapshotId(@Param("productSnapshotId") Long productSnapshotId);
+
+    @Query("""
+           select distinct o.saveTrmMonths
+             from SavingProductOptionSnapshot o
+            where o.productSnapshotId = :productSnapshotId
+              and o.saveTrmMonths is not null
+            order by o.saveTrmMonths asc
+           """)
+    List<Integer> findDistinctTerms(@Param("productSnapshotId") Long productSnapshotId);
+
+    // ▼ 추가: 특정 기간에서 지원하는 적립유형 코드 Distinct (예: "S","F")
+    @Query("""
+           select distinct o.rsrvType
+             from SavingProductOptionSnapshot o
+            where o.productSnapshotId = :productSnapshotId
+              and o.saveTrmMonths   = :termMonths
+           """)
+    List<String> findDistinctReserveTypes(@Param("productSnapshotId") Long productSnapshotId,
+                                          @Param("termMonths") Integer termMonths);
+
+    // ▼ 추가: 기간/유형 조합 존재 여부
+    boolean existsByProductSnapshotIdAndSaveTrmMonthsAndRsrvType(Long productSnapshotId,
+                                                                 Integer saveTrmMonths,
+                                                                 String rsrvType);
 }
