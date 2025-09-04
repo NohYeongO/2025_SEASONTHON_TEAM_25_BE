@@ -63,7 +63,8 @@ public class NewsFacade {
                         article.getId(),
                         article.getTitle(),
                         article.getAiSummary(),
-                        article.getPlainTextContent()
+                        article.getPlainTextContent(),
+                        "news"
                 );
             } catch (Exception ignore) { }
         }

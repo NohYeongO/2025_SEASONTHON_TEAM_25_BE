@@ -1,10 +1,12 @@
 package com.freedom.admin.quiz.api;
 
+import com.freedom.admin.quiz.api.request.CreateQuizRequest;
 import com.freedom.admin.quiz.api.response.AdminQuizDetailResponse;
 import com.freedom.admin.quiz.api.response.AdminQuizResponse;
 import com.freedom.admin.quiz.application.AdminQuizService;
 import com.freedom.common.dto.PageResponse;
 import com.freedom.common.logging.Loggable;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +41,20 @@ public class AdminQuizController {
         AdminQuizDetailResponse response = adminQuizService.getQuizDetail(quizId);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping
+    @Loggable("퀴즈 생성")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdminQuizResponse> createQuiz(@Valid @RequestBody CreateQuizRequest request) {
+        AdminQuizResponse response = adminQuizService.createQuiz(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{quizId}")
+    @Loggable("퀴즈 삭제")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteQuiz(@PathVariable Long quizId) {
+        adminQuizService.deleteQuiz(quizId);
+        return ResponseEntity.ok().build();
+    }
 }
-
-

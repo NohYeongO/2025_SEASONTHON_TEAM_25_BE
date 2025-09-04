@@ -30,7 +30,7 @@ public class WalletTransactionJpaAdapter implements WalletTransactionRepository 
 
     @Override
     public List<WalletTransaction> findByWalletIdOrderByCreatedAtDesc(Long walletId) {
-        return jpaRepository.findByWalletIdOrderByCreatedAtDesc(walletId);
+        return jpaRepository.findByWallet_IdOrderByCreatedAtDesc(walletId);
     }
 
     /**

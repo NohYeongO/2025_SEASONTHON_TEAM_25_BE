@@ -1,6 +1,7 @@
 package com.freedom.auth.infra;
 
 import com.freedom.auth.domain.User;
+import com.freedom.auth.domain.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,6 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     
     boolean existsByEmail(String email);
+    
+    long countByRole(UserRole role);
 }

@@ -26,7 +26,7 @@ public interface WalletTransactionJpaRepository extends JpaRepository<WalletTran
     /**
      * 지갑 ID로 거래 이력 목록 조회 (최신순)
      */
-    List<WalletTransaction> findByWalletIdOrderByCreatedAtDesc(Long walletId);
+    List<WalletTransaction> findByWallet_IdOrderByCreatedAtDesc(Long walletId);
 
     /**
      * 비관적 락으로 지갑 조회 (동시성 제어용)
