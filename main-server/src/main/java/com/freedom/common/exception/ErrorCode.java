@@ -34,7 +34,11 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND("PRODUCT001","상품을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     
     // 뉴스 에러
-    NEWS_NOT_FOUND("NEWS001", "뉴스를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    NEWS_NOT_FOUND("NEWS001", "뉴스를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    
+    // 퀴즈 에러
+    QUIZ_NOT_FOUND("QUIZ001", "퀴즈를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    QUIZ_VALIDATION_ERROR("QUIZ002", "퀴즈 데이터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

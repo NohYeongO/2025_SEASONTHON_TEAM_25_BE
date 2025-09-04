@@ -34,6 +34,12 @@ public class GlobalExceptionHandler {
         return createErrorResponse(ErrorCode.NEWS_NOT_FOUND);
     }
 
+    @ExceptionHandler(QuizNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleQuizNotFoundException(QuizNotFoundException e) {
+        log.warn("퀴즈를 찾을 수 없음: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.QUIZ_NOT_FOUND);
+    }
+
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateEmailException(DuplicateEmailException e) {
         log.warn("이메일 중복: {}", e.getMessage());
