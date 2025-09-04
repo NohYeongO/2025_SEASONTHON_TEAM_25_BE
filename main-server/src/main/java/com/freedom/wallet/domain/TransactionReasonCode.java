@@ -14,5 +14,6 @@ public enum TransactionReasonCode {
     SAVING_JOIN,         // 적금 가입
     SAVING_CANCEL,       // 적금 해제
     SAVING_MATURITY,     // 적금 만기
-    SAVING_INTEREST      // 적금 이자
+    SAVING_INTEREST,     // 적금 이자
+    SAVING_AUTO_DEBIT    // 적금 자동 납입
 }
