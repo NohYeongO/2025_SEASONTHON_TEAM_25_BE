@@ -9,7 +9,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -38,11 +40,16 @@ public class DiscordWebhookClient {
     }
 
     private Map<String, Object> createEmbed(String title, String description, String color) {
+        // 한국 시간(KST)을 ISO 8601 형식으로 변환
+        String timestamp = ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
+                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
         return Map.of(
                 "title", title,
                 "description", description,
                 "color", Integer.parseInt(color),
-                "timestamp", LocalDateTime.now().toString()
+                "timestamp", timestamp,
+                "footer", Map.of("text", "서버 시간 (KST)")
         );
     }
 
