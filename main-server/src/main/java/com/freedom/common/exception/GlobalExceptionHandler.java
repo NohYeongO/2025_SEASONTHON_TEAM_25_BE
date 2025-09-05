@@ -212,6 +212,18 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(ErrorCode.CHARACTER_ALREADY_CREATED));
     }
 
+    @ExceptionHandler(NewsScrapAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleNewsScrapAlreadyExistsException(NewsScrapAlreadyExistsException e) {
+        log.warn("이미 스크랩한 뉴스: userId={}, newsArticleId={}", e.getUserId(), e.getNewsArticleId());
+        return createErrorResponse(ErrorCode.SCRAP_ALREADY_EXISTS);
+    }
+
+    @ExceptionHandler(QuizScrapAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleQuizScrapAlreadyExistsException(QuizScrapAlreadyExistsException e) {
+        log.warn("이미 스크랩한 퀴즈: userId={}, userQuizId={}", e.getUserId(), e.getUserQuizId());
+        return createErrorResponse(ErrorCode.SCRAP_ALREADY_EXISTS);
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ValidationErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
         log.warn("요청 파라미터 유효성 검증 실패: {}", e.getMessage());

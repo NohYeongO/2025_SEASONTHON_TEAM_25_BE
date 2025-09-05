@@ -90,8 +90,7 @@ public class QuizFacade {
     public void submitQuizAnswer(Long userQuizId, String userAnswer) {
         // UserQuiz 존재 여부 사전 확인
         if (!findUserQuizService.existsUserQuiz(userQuizId)) {
-            log.warn("존재하지 않는 UserQuiz 접근 시도. userQuizId: {}", userQuizId);
-            throw new UserQuizNotFoundException(userQuizId);
+            throw new UserQuizNotFoundException(String.valueOf(userQuizId));
         }
 
         // 퀴즈 ID 조회 (내부적으로 예외 처리됨)
