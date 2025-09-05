@@ -51,13 +51,12 @@ public class AutoDebitService {
             def.setName("auto-debit-sub-" + sub.getId());
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             TransactionStatus status = txManager.getTransaction(def);
-
             try {
                 paymentRepo.findNextPlannedPayment(sub.getId()).ifPresent(planned -> {
                     BigDecimal amount = planned.getExpectedAmount();
                     if (amount == null || amount.signum() <= 0) return;
                     String requestId = "AUTO_" + UUID.randomUUID();
-                    // 출금 및 거래 생성 (잔액 부족 시 도메인 예외 -> 롤백됨)
+                    // 출금 및 거래 생성 (잔액 부족 시 도메인 예외 -> 상위 catch로 전파)
                     WalletTransaction txn = savingTxnService.processSavingAutoDebit(userId, requestId, amount, sub.getId());
                     // 납입 이력 반영
                     planned.markPaid(amount, txn.getId(), null);
@@ -65,8 +64,27 @@ public class AutoDebitService {
                 });
                 txManager.commit(status);
             } catch (Exception e) {
-                // 잔액 부족, 멱등, 동시성 등은 개별 구독 단위로 롤백하고 다음 구독 처리
+                // 실패 시 롤백 후 미납 처리 + 3회 누적 시 강제 해지
                 txManager.rollback(status);
+
+                DefaultTransactionDefinition missDef = new DefaultTransactionDefinition();
+                missDef.setName("auto-debit-miss-" + sub.getId());
+                missDef.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                TransactionStatus missTx = txManager.getTransaction(missDef);
+                try {
+                    paymentRepo.findNextPlannedPayment(sub.getId()).ifPresent(planned -> {
+                        planned.markMissed();
+                        paymentRepo.save(planned);
+                    });
+                    long missed = paymentRepo.countBySubscriptionIdAndStatus(sub.getId(), SavingPaymentHistory.PaymentStatus.MISSED);
+                    if (missed >= 3 && sub.getStatus() == SubscriptionStatus.ACTIVE) {
+                        sub.forceCancel();
+                        subscriptionRepo.save(sub);
+                    }
+                    txManager.commit(missTx);
+                } catch (Exception ex) {
+                    txManager.rollback(missTx);
+                }
             }
         }
 
@@ -75,7 +93,6 @@ public class AutoDebitService {
         def.setName("auto-debit-last-date");
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = txManager.getTransaction(def);
-
         try {
             User u = userRepo.findById(userId).orElseThrow();
             u.updateLastAutoPaymentDate(today);
