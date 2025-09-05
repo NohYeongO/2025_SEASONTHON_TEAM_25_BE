@@ -50,4 +50,8 @@ public interface SavingProductOptionSnapshotJpaRepository extends JpaRepository<
     boolean existsByProductSnapshotIdAndSaveTrmMonthsAndRsrvType(Long productSnapshotId,
                                                                  Integer saveTrmMonths,
                                                                  String rsrvType);
+
+    // 기간 일치하는 옵션 중 금리가 가장 높은 하나 선택
+    SavingProductOptionSnapshot findFirstByProductSnapshotIdAndSaveTrmMonthsOrderByIntrRateDesc(Long productSnapshotId,
+                                                                                                Integer saveTrmMonths);
 }
