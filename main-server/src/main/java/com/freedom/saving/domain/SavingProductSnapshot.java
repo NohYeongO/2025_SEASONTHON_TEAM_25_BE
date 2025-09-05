@@ -86,6 +86,9 @@ public class SavingProductSnapshot {
     @Column(name = "fetched_at", nullable = false)
     private LocalDateTime fetchedAt;
 
+    @Column(name = "ai_summary", columnDefinition = "TEXT")
+    private String aiSummary;
+
     // 생성 전용 팩토리: 드래프트를 받아 엔티티를 생성
     public static SavingProductSnapshot from(SavingProductSnapshotDraft d, boolean isLatest, LocalDateTime fetchedAt) {
         SavingProductSnapshot e = new SavingProductSnapshot();

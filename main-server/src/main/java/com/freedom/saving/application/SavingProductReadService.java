@@ -64,7 +64,7 @@ public class SavingProductReadService {
             item.setBankName(s.getKorCoNm());
 
             // DTO에 해당 필드가 아직 존재한다면 null/빈값으로 둔다.
-            item.setAiSummary(""); // 추후 AI 요약이 준비되면 주입
+            item.setAiSummary(s.getAiSummary() != null ? s.getAiSummary() : "");
 
             items.add(item);
         }

@@ -15,7 +15,6 @@ public class SavingProductListItem {
     private Long productSnapshotId;
     private String productName;
     private String bankName;
-    private BigDecimal bestRate; // 페이지 내 일괄 집계해서 채움
-    private String aiSummary;    // 자리만 확보
+    private String aiSummary;
 
 }
