@@ -42,7 +42,7 @@ public class FindUserQuizService {
     public Long findQuizIdByUserQuizId(Long userQuizId) {
         Long quizId = userQuizRepository.findQuizIdByUserQuizId(userQuizId);
         if (quizId == null) {
-            throw new UserQuizNotFoundException(userQuizId);
+            throw new UserQuizNotFoundException(String.valueOf(userQuizId));
         }
         return quizId;
     }
