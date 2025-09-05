@@ -155,6 +155,11 @@ public class GlobalExceptionHandler {
         return createErrorResponse(ErrorCode.SAVING_SNAPSHOT_IDENTIFIERS_INVALID);
     }
 
+    @ExceptionHandler(SavingExceptions.SavingDuplicateSubscriptionException.class)
+    public ResponseEntity<ErrorResponse> handleSavingDuplicateSubscription() {
+        return createErrorResponse(ErrorCode.SAVING_DUPLICATE_SUBSCRIPTION);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.warn("유효성 검증 실패: {}", e.getBindingResult().getAllErrors());

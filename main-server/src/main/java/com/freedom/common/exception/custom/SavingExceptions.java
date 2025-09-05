@@ -49,4 +49,10 @@ public class SavingExceptions {
             super("스냅샷 식별자가 유효하지 않습니다.");
         }
     }
+
+    public static class SavingDuplicateSubscriptionException extends RuntimeException {
+        public SavingDuplicateSubscriptionException() {
+            super("이미 가입한 적금에 또 가입할 수 없습니다.");
+        }
+    }
 }

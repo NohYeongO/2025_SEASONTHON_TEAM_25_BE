@@ -52,7 +52,8 @@ public enum ErrorCode {
     SAVING_INVALID_DATES("SAV005", "시작일/만기일이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
     SAVING_PAYMENT_INVALID_PARAMS("SAV006", "납입 파라미터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
     SAVING_POLICY_INVALID("SAV007", "정책 파라미터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
-    SAVING_SNAPSHOT_IDENTIFIERS_INVALID("SAV008", "스냅샷 식별자가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+    SAVING_SNAPSHOT_IDENTIFIERS_INVALID("SAV008", "스냅샷 식별자가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    SAVING_DUPLICATE_SUBSCRIPTION("SAV009", "이미 가입한 적금에 또 가입할 수 없습니다.", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

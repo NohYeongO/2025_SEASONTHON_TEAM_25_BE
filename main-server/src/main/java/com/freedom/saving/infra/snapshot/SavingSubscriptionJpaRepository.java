@@ -16,4 +16,6 @@ public interface SavingSubscriptionJpaRepository extends JpaRepository<SavingSub
     List<SavingSubscription> findByUserIdAndStatusIn(Long userId, List<SubscriptionStatus> statuses);
 
     Optional<SavingSubscription> findByIdAndUserId(Long id, Long userId);
+
+    boolean existsByUserIdAndProductSnapshotIdAndStatus(Long userId, Long productSnapshotId, SubscriptionStatus status);
 }
