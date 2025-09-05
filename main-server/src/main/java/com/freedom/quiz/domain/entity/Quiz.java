@@ -52,6 +52,19 @@ public class Quiz extends BaseEntity {
 
     @Column(name = "mcq_correct_index")
     private Integer mcqCorrectIndex; // 1..4
+
+    /**
+     * 사용자 답안이 정답인지 확인
+     */
+    public boolean isCorrectAnswer(String userAnswer) {
+        if (type == QuizType.OX) {
+            return oxAnswer != null && oxAnswer.toString().equalsIgnoreCase(userAnswer);
+        } else if (type == QuizType.MCQ) {
+            return mcqCorrectIndex != null && mcqCorrectIndex.toString().equals(userAnswer);
+        }
+        return false;
+    }
 }
+
 
 

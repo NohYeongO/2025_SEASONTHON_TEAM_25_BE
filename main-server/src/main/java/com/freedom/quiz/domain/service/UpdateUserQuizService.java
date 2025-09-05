@@ -1,0 +1,25 @@
+package com.freedom.quiz.domain.service;
+
+import com.freedom.quiz.domain.entity.UserQuiz;
+import com.freedom.common.exception.custom.UserQuizNotFoundException;
+import com.freedom.quiz.infra.UserQuizRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UpdateUserQuizService {
+
+    private final UserQuizRepository userQuizRepository;
+
+    /**
+     * 사용자 퀴즈 답안 업데이트
+     */
+    public void updateAnswer(Long userQuizId, String userAnswer, boolean isCorrect) {
+        UserQuiz userQuiz = userQuizRepository.findById(userQuizId)
+                .orElseThrow(() -> new UserQuizNotFoundException(userQuizId));
+
+        userQuiz.submitAnswer(userAnswer, isCorrect);
+        userQuizRepository.save(userQuiz);
+    }
+}
