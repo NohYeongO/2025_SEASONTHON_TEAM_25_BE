@@ -94,7 +94,7 @@ public class SavingProductReadService {
         detail.setEtcNote(s.getEtcNote());
         detail.setFetchedAt(s.getFetchedAt());
 
-        detail.setAiSummary(""); // 자리만 확보(추후 요약/설명 주입)
+        detail.setAiSummary(s.getAiSummary() != null ? s.getAiSummary() : "");
 
         List<SavingProductOptionItem> optionItems = new ArrayList<SavingProductOptionItem>();
         for (SavingProductOptionSnapshot o : options) {
