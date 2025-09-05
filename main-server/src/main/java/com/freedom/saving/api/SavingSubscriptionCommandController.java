@@ -7,11 +7,15 @@ import com.freedom.saving.application.SavingSubscriptionCommandService;
 import com.freedom.saving.application.signup.OpenSubscriptionCommand;
 import com.freedom.saving.application.signup.OpenSubscriptionResult;
 import com.freedom.saving.application.signup.SavingSubscriptionService;
+import com.freedom.saving.application.MaturitySettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/savings/subscriptions")
@@ -21,6 +25,9 @@ public class SavingSubscriptionCommandController {
 
     private final SavingSubscriptionService service;
     private final SavingSubscriptionCommandService commandService;
+    private final MaturitySettlementService maturitySettlementService;
+
+    public record MaturityQuoteResponse(BigDecimal principal, BigDecimal rate, BigDecimal interest, BigDecimal total) {}
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -50,5 +57,31 @@ public class SavingSubscriptionCommandController {
             @PathVariable Long subscriptionId
     ) {
         commandService.cancelByUser(principal.getId(), subscriptionId);
+    }
+
+    @GetMapping("/maturity/pending")
+    public List<MaturitySettlementService.PendingMaturityDto> pendingMaturities(
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        return maturitySettlementService.listPendingMaturities(principal.getId());
+    }
+
+    @GetMapping("/{subscriptionId}/maturity/quote")
+    public MaturityQuoteResponse quote(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @PathVariable Long subscriptionId
+    ) {
+        var q = maturitySettlementService.getMaturityQuote(principal.getId(), subscriptionId);
+        return new MaturityQuoteResponse(q.principal(), q.rate(), q.interest(), q.total());
+    }
+
+    @PostMapping("/{subscriptionId}/maturity/claim")
+    @ResponseStatus(HttpStatus.OK)
+    public MaturityQuoteResponse claim(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @PathVariable Long subscriptionId
+    ) {
+        var q = maturitySettlementService.settleMaturity(principal.getId(), subscriptionId);
+        return new MaturityQuoteResponse(q.principal(), q.rate(), q.interest(), q.total());
     }
 }

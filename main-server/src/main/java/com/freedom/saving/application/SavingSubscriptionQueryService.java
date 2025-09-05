@@ -31,7 +31,7 @@ public class SavingSubscriptionQueryService {
                             int progressPercentage, String joinDate, String maturityDate, int remainingPayments) {}
 
     public record CompletedDto(Long subscriptionId, String productName, BigDecimal finalAmount,
-                               String joinDate, String maturityDate) {}
+                               String joinDate, String maturityDate, int progressPercentage) {}
 
     public List<ActiveDto> getActive(Long userId) {
         List<SavingSubscription> subs = subscriptionRepo.findByUserIdAndStatus(userId, SubscriptionStatus.ACTIVE);
@@ -40,7 +40,7 @@ public class SavingSubscriptionQueryService {
 
     public List<CompletedDto> getCompleted(Long userId) {
         List<SavingSubscription> subs = subscriptionRepo.findByUserIdAndStatusIn(userId,
-                List.of(SubscriptionStatus.MATURED, SubscriptionStatus.CANCELLED, SubscriptionStatus.FORCED_CANCELLED));
+                List.of(SubscriptionStatus.MATURED));
         return subs.stream().map(this::toCompleted).toList();
     }
 
@@ -87,7 +87,8 @@ public class SavingSubscriptionQueryService {
                 productName,
                 finalAmount,
                 join.toString(),
-                maturityByPolicy.toString()
+                maturityByPolicy.toString(),
+                100
         );
     }
 }
