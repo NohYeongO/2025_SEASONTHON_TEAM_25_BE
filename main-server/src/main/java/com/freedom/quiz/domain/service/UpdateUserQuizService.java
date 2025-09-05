@@ -17,7 +17,7 @@ public class UpdateUserQuizService {
      */
     public void updateAnswer(Long userQuizId, String userAnswer, boolean isCorrect) {
         UserQuiz userQuiz = userQuizRepository.findById(userQuizId)
-                .orElseThrow(() -> new UserQuizNotFoundException(userQuizId));
+                .orElseThrow(() -> new UserQuizNotFoundException(String.valueOf(userQuizId)));
 
         userQuiz.submitAnswer(userAnswer, isCorrect);
         userQuizRepository.save(userQuiz);
