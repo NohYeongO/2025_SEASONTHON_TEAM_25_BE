@@ -106,7 +106,14 @@ public class SavingSubscriptionService {
     }
 
     private String normalizeReserveType(String reserveType) {
-        return reserveType == null ? null : reserveType.trim().toUpperCase();
+        if (reserveType == null) return null;
+        String v = reserveType.trim();
+        if (v.isEmpty()) return null; // 빈 문자열은 미지정으로 처리
+        v = v.toUpperCase();
+        // 별칭 허용
+        if ("FIXED".equals(v)) return RESERVE_S;
+        if ("FREE".equals(v)) return RESERVE_F;
+        return v;
     }
 
     private String chooseReserveType(Long snapshotId, int termMonths, String requested) {

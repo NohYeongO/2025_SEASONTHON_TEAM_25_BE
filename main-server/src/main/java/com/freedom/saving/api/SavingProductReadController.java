@@ -24,7 +24,7 @@ public class SavingProductReadController {
     }
 
     @GetMapping
-    public Page<SavingProductListItem> getProducts(
+    public Object getProducts(
             // 타입은 현재 SAVING만 지원. 추후 예/적금 분리 시 확장 포인트.
             @RequestParam(name = "type", defaultValue = "SAVING") @NotBlank String type,
             // 정렬 정책 키. 현재 popular(임시)만 허용.
@@ -39,7 +39,10 @@ public class SavingProductReadController {
             throw new SavingExceptions.SavingPolicyInvalidException("지원하지 않는 sort 값입니다. (허용: popular)");
         }
         // 서비스는 인기순 = subscriberCount DESC 전체 반환
-        return readService.getPopularSavingProducts(0, Integer.MAX_VALUE);
+        return java.util.Map.of(
+                "content",
+                readService.getPopularSavingProducts(0, Integer.MAX_VALUE).getContent()
+        );
     }
 
     @GetMapping("/{id}")

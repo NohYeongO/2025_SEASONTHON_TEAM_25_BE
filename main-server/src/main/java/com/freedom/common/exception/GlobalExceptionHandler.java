@@ -89,6 +89,29 @@ public class GlobalExceptionHandler {
     }
 
     // ===== saving mapping =====
+    @ExceptionHandler(com.freedom.saving.application.signup.exception.ReserveTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleReserveTypeNotSupportedSignup(com.freedom.saving.application.signup.exception.ReserveTypeNotSupportedException e) {
+        log.warn("적립유형 미지원: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.SAVING_POLICY_INVALID);
+    }
+
+    @ExceptionHandler(com.freedom.saving.application.signup.exception.MissingReserveTypeSelectionException.class)
+    public ResponseEntity<ErrorResponse> handleMissingReserveTypeSelection(com.freedom.saving.application.signup.exception.MissingReserveTypeSelectionException e) {
+        log.warn("적립유형 선택 누락: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.SAVING_POLICY_INVALID);
+    }
+
+    @ExceptionHandler(com.freedom.saving.application.signup.exception.ProductTermNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleProductTermNotSupported(com.freedom.saving.application.signup.exception.ProductTermNotSupportedException e) {
+        log.warn("기간 미지원: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.SAVING_POLICY_INVALID);
+    }
+
+    @ExceptionHandler(com.freedom.saving.application.signup.exception.MissingTermSelectionException.class)
+    public ResponseEntity<ErrorResponse> handleMissingTermSelection(com.freedom.saving.application.signup.exception.MissingTermSelectionException e) {
+        log.warn("기간 선택 누락: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.SAVING_POLICY_INVALID);
+    }
     @ExceptionHandler(SavingExceptions.SavingSubscriptionNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleSavingSubscriptionNotFound() {
         return createErrorResponse(ErrorCode.SAVING_SUBSCRIPTION_NOT_FOUND);
