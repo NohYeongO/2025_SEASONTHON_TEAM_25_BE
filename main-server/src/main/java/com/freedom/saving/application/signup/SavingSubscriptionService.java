@@ -76,6 +76,8 @@ public class SavingSubscriptionService {
                 startServiceDate,
                 maturityServiceDate
         );
+        // 인기 집계 증가
+        snapshotPort.incrementSubscriberCount(cmd.getProductSnapshotId());
         return new OpenSubscriptionResult(subscriptionId, startServiceDate, maturityServiceDate);
     }
 

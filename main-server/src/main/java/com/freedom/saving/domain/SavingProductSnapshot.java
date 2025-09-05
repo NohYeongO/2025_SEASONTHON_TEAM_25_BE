@@ -89,6 +89,10 @@ public class SavingProductSnapshot {
     @Column(name = "ai_summary", columnDefinition = "TEXT")
     private String aiSummary;
 
+    // 가입자 수(인기순 정렬용 집계 컬럼)
+    @Column(name = "subscriber_count", nullable = false)
+    private Long subscriberCount = 0L;
+
     // 생성 전용 팩토리: 드래프트를 받아 엔티티를 생성
     public static SavingProductSnapshot from(SavingProductSnapshotDraft d, boolean isLatest, LocalDateTime fetchedAt) {
         SavingProductSnapshot e = new SavingProductSnapshot();

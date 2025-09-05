@@ -46,4 +46,10 @@ public interface SavingProductSnapshotJpaRepository extends JpaRepository<Saving
      * 정렬은 Pageable의 Sort를 따른다
      */
     Page<SavingProductSnapshot> findByIsLatestTrue(Pageable pageable);
+
+    /**
+     * 최신 스냅샷 전체 조회 - 가입자수 내림차순(없으면 0)
+     */
+    @Query("select s from SavingProductSnapshot s where s.isLatest = true order by coalesce(s.subscriberCount, 0) desc")
+    List<SavingProductSnapshot> findAllLatestOrderBySubscriberCountDesc();
 }

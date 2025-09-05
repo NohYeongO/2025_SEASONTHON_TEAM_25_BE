@@ -40,22 +40,14 @@ public class SavingProductReadService {
     /**
      * [목록] 인기순 적금 상품 조회
      *
-     * 현재: 가입 수 집계가 준비되지 않아 임시로 fetchedAt DESC(최신 수집 순) 사용
-     * 추후: 가입 수 기반 정렬로 교체
-     *
-     * @param page 0-base 페이지 번호
-     * @param size 페이지 크기
-     * @return SavingProductListItem Page
+     * 정렬 기준: 최신 스냅샷 중 subscriberCount 내림차순
+     * 프론트 요구에 따라 전체 리스트를 반환한다.
      */
     public Page<SavingProductListItem> getPopularSavingProducts(int page, int size) {
-        // 임시 인기순: 최신 스냅샷 우선
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "fetchedAt"));
+        // 1) 최신 스냅샷 전체 조회(가입자수 내림차순)
+        List<SavingProductSnapshot> contents = productRepo.findAllLatestOrderBySubscriberCountDesc();
 
-        // 1) 최신 스냅샷 페이징 엔티티 조회
-        Page<SavingProductSnapshot> pageResult = productRepo.findByIsLatestTrue(pageable);
-
-        // 2) 엔티티 -> 목록 DTO 수작업 매핑
-        List<SavingProductSnapshot> contents = pageResult.getContent();
+        // 2) 엔티티 -> 목록 DTO
         List<SavingProductListItem> items = new ArrayList<SavingProductListItem>();
         for (SavingProductSnapshot s : contents) {
             SavingProductListItem item = new SavingProductListItem();
@@ -69,8 +61,8 @@ public class SavingProductReadService {
             items.add(item);
         }
 
-        // 3) Page 래핑 반환
-        return new PageImpl<SavingProductListItem>(items, pageable, pageResult.getTotalElements());
+        // 3) Page 래핑 반환 (전체)
+        return new PageImpl<SavingProductListItem>(items, PageRequest.of(0, items.isEmpty() ? 1 : items.size()), items.size());
     }
 
     /**
