@@ -2,13 +2,10 @@ package com.freedom.saving.api;
 
 import com.freedom.common.security.CustomUserPrincipal;
 import com.freedom.saving.application.SavingPaymentCommandService;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/savings/subscriptions")
@@ -18,15 +15,12 @@ public class SavingPaymentCommandController {
 
     private final SavingPaymentCommandService commandService;
 
-    public record DepositRequest(@Positive BigDecimal amount) {}
-
     @PostMapping("/{subscriptionId}/deposit")
     public void deposit(
             @AuthenticationPrincipal CustomUserPrincipal principal,
-            @PathVariable Long subscriptionId,
-            @RequestBody(required = false) DepositRequest request
+            @PathVariable Long subscriptionId
     ) {
-        BigDecimal amount = request != null ? request.amount() : null;
-        commandService.depositNext(principal.getId(), subscriptionId, amount);
+        // 가입 시 설정된 자동이체 금액(예정 금액)으로 납입 처리
+        commandService.depositNext(principal.getId(), subscriptionId, null);
     }
 }
