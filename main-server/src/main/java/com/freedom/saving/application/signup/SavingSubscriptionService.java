@@ -1,6 +1,8 @@
 package com.freedom.saving.application.signup;
 
 import com.freedom.common.time.TimeProvider;
+import com.freedom.saving.domain.payment.SavingPaymentHistory;
+import com.freedom.saving.domain.payment.SavingPaymentHistoryRepository;
 import com.freedom.saving.application.port.SavingProductSnapshotPort;
 import com.freedom.saving.application.port.SavingSubscriptionPort;
 import com.freedom.saving.application.signup.exception.*;
@@ -30,6 +32,7 @@ public class SavingSubscriptionService {
     private final SavingSubscriptionPort subscriptionPort;
     private final TimeProvider timeProvider;                // 현재 시각
     private final TickPolicy tickPolicy;                    // 1일 = 1개월 정책
+    private final SavingPaymentHistoryRepository paymentHistoryRepository; // 가입 시 스케줄 생성
 
     private static final String RESERVE_S = "S"; // 정액적립식
     private static final String RESERVE_F = "F"; // 자유적립식
@@ -76,6 +79,23 @@ public class SavingSubscriptionService {
                 startServiceDate,
                 maturityServiceDate
         );
+
+        // 정액적립식(S): 가입과 동시에 전체 납입 스케줄(PLANNED) 생성
+        if (RESERVE_S.equals(chosenReserve)) {
+            // 첫 납입 예정일 = 가입일 + 1 서비스일
+            java.time.LocalDate firstDue = tickPolicy.calcFirstTransferDate(startServiceDate);
+            java.math.BigDecimal expected = cmd.getAutoDebitAmount();
+            for (int i = 1; i <= chosenTerm; i++) {
+                java.time.LocalDate due = firstDue.plusDays(i - 1L);
+                SavingPaymentHistory planned = SavingPaymentHistory.planned(
+                        subscriptionId,
+                        i,
+                        due,
+                        expected
+                );
+                paymentHistoryRepository.save(planned);
+            }
+        }
         // 인기 집계 증가
         snapshotPort.incrementSubscriberCount(cmd.getProductSnapshotId());
         return new OpenSubscriptionResult(subscriptionId, startServiceDate, maturityServiceDate);
