@@ -1,6 +1,7 @@
 package com.freedom.saving.domain.payment;
 
 import com.freedom.common.entity.BaseEntity;
+import com.freedom.common.exception.custom.SavingExceptions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -78,10 +79,10 @@ public class SavingPaymentHistory extends BaseEntity {
     private String description;
 
     public static SavingPaymentHistory planned(Long subscriptionId, Integer cycleNo, LocalDate dueDate, BigDecimal expectedAmount) {
-        if (subscriptionId == null) throw new IllegalArgumentException("subscriptionId is required");
-        if (cycleNo == null || cycleNo <= 0) throw new IllegalArgumentException("cycleNo must be >= 1");
-        if (dueDate == null) throw new IllegalArgumentException("dueServiceDate is required");
-        if (expectedAmount == null || expectedAmount.signum() <= 0) throw new IllegalArgumentException("expectedAmount must be > 0");
+        if (subscriptionId == null) throw new SavingExceptions.SavingPaymentInvalidParamsException("subscriptionId is required");
+        if (cycleNo == null || cycleNo <= 0) throw new SavingExceptions.SavingPaymentInvalidParamsException("cycleNo must be >= 1");
+        if (dueDate == null) throw new SavingExceptions.SavingPaymentInvalidParamsException("dueServiceDate is required");
+        if (expectedAmount == null || expectedAmount.signum() <= 0) throw new SavingExceptions.SavingPaymentInvalidParamsException("expectedAmount must be > 0");
         SavingPaymentHistory h = new SavingPaymentHistory();
         h.subscriptionId = subscriptionId;
         h.cycleNo = cycleNo;
@@ -94,7 +95,7 @@ public class SavingPaymentHistory extends BaseEntity {
     }
 
     public void markPaid(BigDecimal amount, Long walletTxnId, LocalDateTime paidAt) {
-        if (amount == null || amount.signum() <= 0) throw new IllegalArgumentException("amount must be > 0");
+        if (amount == null || amount.signum() <= 0) throw new SavingExceptions.SavingInvalidPaymentAmountException();
         this.paidAmount = amount;
         this.paidAt = paidAt != null ? paidAt : LocalDateTime.now();
         this.walletTxnId = walletTxnId;

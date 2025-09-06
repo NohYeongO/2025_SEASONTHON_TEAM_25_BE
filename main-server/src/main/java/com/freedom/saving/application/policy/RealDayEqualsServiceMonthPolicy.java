@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
+import com.freedom.common.exception.custom.SavingExceptions;
+
 public class RealDayEqualsServiceMonthPolicy implements TickPolicy {
 
     private final TimeProvider timeProvider;
@@ -21,7 +23,7 @@ public class RealDayEqualsServiceMonthPolicy implements TickPolicy {
     @Override
     public int toTotalTicks(int termMonths) {
         if (termMonths <= 0) {
-            throw new IllegalArgumentException("termMonths는 1 이상이어야 합니다.");
+            throw new SavingExceptions.SavingPolicyInvalidException("termMonths는 1 이상이어야 합니다.");
         }
         return termMonths;
     }
@@ -43,7 +45,7 @@ public class RealDayEqualsServiceMonthPolicy implements TickPolicy {
     public LocalDate calcNextTransferDate(LocalDate joinDate, int currentTick) {
         requireNonNull(joinDate);
         if (currentTick < 0) {
-            throw new IllegalArgumentException("currentTick은 0 이상이어야 합니다.");
+            throw new SavingExceptions.SavingPolicyInvalidException("currentTick은 0 이상이어야 합니다.");
         }
         // next = 가입 + 1일 + 지금까지 처리된 회차 수
         return joinDate.plusDays(1L + currentTick);
@@ -73,7 +75,7 @@ public class RealDayEqualsServiceMonthPolicy implements TickPolicy {
 
     private void requireNonNull(LocalDate date) {
         if (Objects.isNull(date)) {
-            throw new IllegalArgumentException("날짜는 null일 수 없습니다.");
+            throw new SavingExceptions.SavingPolicyInvalidException("날짜는 null일 수 없습니다.");
         }
     }
 }

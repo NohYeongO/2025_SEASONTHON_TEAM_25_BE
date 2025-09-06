@@ -42,4 +42,19 @@ public class SavingProductSnapshotAdapter implements SavingProductSnapshotPort {
         String code = reserveTypeCode == null ? null : reserveTypeCode.trim().toUpperCase();
         return optionRepo.existsByProductSnapshotIdAndSaveTrmMonthsAndRsrvType(productSnapshotId, termMonths, code);
     }
+
+    /** 가입 발생 시 인기 집계 증가 */
+    @Override
+    @Transactional
+    public void incrementSubscriberCount(Long productSnapshotId) {
+        productRepo.findById(productSnapshotId).ifPresent(s -> {
+            try {
+                java.lang.reflect.Field f = s.getClass().getDeclaredField("subscriberCount");
+                f.setAccessible(true);
+                Long cur = (Long) f.get(s);
+                f.set(s, cur == null ? 1L : cur + 1L);
+            } catch (Exception ignore) {}
+            productRepo.save(s);
+        });
+    }
 }

@@ -1,5 +1,6 @@
 package com.freedom.saving.domain.shapshot;
 
+import com.freedom.common.exception.custom.SavingExceptions;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -38,7 +39,7 @@ public class SavingProductOptionSnapshotDraft {
             BigDecimal intrRate2
     ) {
         if (isBlank(dclsMonth) || isBlank(finCoNo) || isBlank(finPrdtCd)) {
-            throw new IllegalArgumentException("필수 식별자(dclsMonth/finCoNo/finPrdtCd)는 비어 있을 수 없습니다.");
+            throw new SavingExceptions.SavingSnapshotIdentifiersInvalidException();
         }
         this.dclsMonth = dclsMonth;
         this.finCoNo = finCoNo;

@@ -1,5 +1,7 @@
 package com.freedom.saving.application.signup;
 
+import com.freedom.common.exception.custom.SavingExceptions;
+
 import java.math.BigDecimal;
 
 /**
@@ -20,10 +22,10 @@ public class OpenSubscriptionCommand {
                                    String reserveType,
                                    BigDecimal autoDebitAmount) {
         if (userId == null || userId.longValue() <= 0L) {
-            throw new IllegalArgumentException("userId는 필수입니다.");
+            throw new SavingExceptions.SavingPaymentInvalidParamsException("userId는 필수입니다.");
         }
         if (productSnapshotId == null || productSnapshotId.longValue() <= 0L) {
-            throw new IllegalArgumentException("productSnapshotId는 필수입니다.");
+            throw new SavingExceptions.SavingPaymentInvalidParamsException("productSnapshotId는 필수입니다.");
         }
         this.userId = userId;
         this.productSnapshotId = productSnapshotId;

@@ -1,5 +1,6 @@
 package com.freedom.saving.domain.shapshot;
 
+import com.freedom.common.exception.custom.SavingExceptions;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -50,7 +51,7 @@ public class SavingProductSnapshotDraft {
     ) {
         // 최소 식별자 유효성(엔티티 전 단계에서도 기본 검증)
         if (isBlank(dclsMonth) || isBlank(finCoNo) || isBlank(finPrdtCd)) {
-            throw new IllegalArgumentException("필수 식별자(dclsMonth/finCoNo/finPrdtCd)는 비어 있을 수 없습니다.");
+            throw new SavingExceptions.SavingSnapshotIdentifiersInvalidException();
         }
         this.dclsMonth = dclsMonth;
         this.finCoNo = finCoNo;

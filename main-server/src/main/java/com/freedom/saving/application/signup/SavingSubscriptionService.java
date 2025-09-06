@@ -4,6 +4,7 @@ import com.freedom.common.time.TimeProvider;
 import com.freedom.saving.application.port.SavingProductSnapshotPort;
 import com.freedom.saving.application.port.SavingSubscriptionPort;
 import com.freedom.saving.application.signup.exception.*;
+import com.freedom.saving.domain.policy.TickPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +29,7 @@ public class SavingSubscriptionService {
     private final SavingProductSnapshotPort snapshotPort;
     private final SavingSubscriptionPort subscriptionPort;
     private final TimeProvider timeProvider;                // 현재 시각
+    private final TickPolicy tickPolicy;                    // 1일 = 1개월 정책
 
     private static final String RESERVE_S = "S"; // 정액적립식
     private static final String RESERVE_F = "F"; // 자유적립식
@@ -36,9 +37,6 @@ public class SavingSubscriptionService {
     private LocalDate serviceToday(ZonedDateTime now) {
         // "현실 하루 = 서비스 한 달", '오늘'을 서비스 기준일로 그대로 쓴다고 가정
         return now.toLocalDate();
-    }
-    private LocalDate plusServiceMonths(LocalDate serviceStart, int termMonths) {
-        return serviceStart.plusMonths(termMonths);
     }
 
     @Transactional
@@ -66,7 +64,7 @@ public class SavingSubscriptionService {
         // 5) 서비스 달력 날짜 계산
         ZonedDateTime now = timeProvider.now();
         LocalDate startServiceDate = serviceToday(now);
-        LocalDate maturityServiceDate = plusServiceMonths(startServiceDate, chosenTerm);
+        LocalDate maturityServiceDate = tickPolicy.calcMaturityDate(startServiceDate, chosenTerm);
 
         // 6) 저장 (서비스 일자 전달)
         Long subscriptionId = subscriptionPort.open(
@@ -78,6 +76,8 @@ public class SavingSubscriptionService {
                 startServiceDate,
                 maturityServiceDate
         );
+        // 인기 집계 증가
+        snapshotPort.incrementSubscriberCount(cmd.getProductSnapshotId());
         return new OpenSubscriptionResult(subscriptionId, startServiceDate, maturityServiceDate);
     }
 
@@ -90,87 +90,52 @@ public class SavingSubscriptionService {
      */
     private int chooseTerm(Long snapshotId, Integer requestedTerm) {
         List<Integer> supported = snapshotPort.getSupportedTermMonths(snapshotId);
-        if (supported == null) supported = new ArrayList<Integer>();
-        if (supported.isEmpty()) {
-            throw new IllegalStateException("save_trm 후보가 없습니다. snapshotId=" + snapshotId);
-        }
-
         if (requestedTerm != null) {
-            boolean exists = false;
-            for (int i = 0; i < supported.size(); i++) {
-                Integer v = supported.get(i);
-                if (v != null && v.intValue() == requestedTerm.intValue()) {
-                    exists = true;
-                    break;
-                }
+            if (!supported.contains(requestedTerm)) {
+                throw new ProductTermNotSupportedException(requestedTerm);
             }
-            if (!exists) {
-                throw new ProductTermNotSupportedException(requestedTerm.intValue());
-            }
-            return requestedTerm.intValue();
+            return requestedTerm;
         }
-
-        // 미전달 케이스
+        if (supported.isEmpty()) {
+            throw new MissingTermSelectionException(supported);
+        }
         if (supported.size() == 1) {
-            Integer only = supported.get(0);
-            return only != null ? only.intValue() : 0;
+            return supported.get(0);
         }
-        // 후보가 2개 이상이면 명시 요구(12/24/36 등)
         throw new MissingTermSelectionException(supported);
     }
 
-    /**
-     * 적립유형 선택 규칙(기간별):
-     * - 요청 reserveType 미전달:
-     *    - 후보 1개면 자동 선택
-     *    - 후보 2개 이상이면 MissingReserveTypeSelectionException
-     * - 요청 전달:
-     *    - 후보에 없으면 ReserveTypeNotSupportedException
-     */
-    private String chooseReserveType(Long snapshotId, int termMonths, String requestedReserve) {
-        List<String> supported = snapshotPort.getSupportedReserveTypes(snapshotId, termMonths);
-        if (supported == null) supported = new ArrayList<String>();
-
-        if (requestedReserve == null || requestedReserve.trim().isEmpty()) {
-            if (supported.size() == 1) {
-                return supported.get(0);
-            }
-            throw new MissingReserveTypeSelectionException(termMonths, supported);
-        }
-
-        String value = requestedReserve.toUpperCase();
-        boolean exists = false;
-        for (int i = 0; i < supported.size(); i++) {
-            String s = supported.get(i);
-            if (s != null && s.toUpperCase().equals(value)) {
-                exists = true;
-                break;
-            }
-        }
-        if (!exists) {
-            throw new ReserveTypeNotSupportedException(termMonths, requestedReserve);
-        }
-        return value;
-    }
-
-    /**
-     * 사용자가 "정액/자유" 같은 별칭을 보낼 수 있으니 표준코드로 정규화.
-     * - FIXED/REGULAR → S
-     * - FLEX/FREE     → F
-     * - 그 외는 원문 유지(후보 검증에서 실패 유도)
-     */
     private String normalizeReserveType(String reserveType) {
         if (reserveType == null) return null;
-        String v = reserveType.trim().toUpperCase();
-        if ("FIXED".equals(v) || "REGULAR".equals(v)) return RESERVE_S;
-        if ("FLEX".equals(v) || "FREE".equals(v)) return RESERVE_F;
-        if (RESERVE_S.equals(v) || RESERVE_F.equals(v)) return v;
+        String v = reserveType.trim();
+        if (v.isEmpty()) return null; // 빈 문자열은 미지정으로 처리
+        v = v.toUpperCase();
+        // 별칭 허용
+        if ("FIXED".equals(v)) return RESERVE_S;
+        if ("FREE".equals(v)) return RESERVE_F;
         return v;
     }
 
-    /** 정액식(S) 검증: 금액 null 금지 + 0 초과 */
+    private String chooseReserveType(Long snapshotId, int termMonths, String requested) {
+        List<String> supported = snapshotPort.getSupportedReserveTypes(snapshotId, termMonths);
+        if (requested != null) {
+            if (!supported.contains(requested)) {
+                throw new ReserveTypeNotSupportedException(termMonths, requested);
+            }
+            return requested;
+        }
+        if (supported.isEmpty()) {
+            throw new MissingReserveTypeSelectionException(termMonths, supported);
+        }
+        if (supported.size() == 1) {
+            return supported.get(0);
+        }
+        throw new MissingReserveTypeSelectionException(termMonths, supported);
+    }
+
     private void validateAutoDebitAmountForFixed(BigDecimal amount) {
-        if (amount == null) throw new InvalidAutoDebitAmountForFixedException(null);
-        if (amount.signum() <= 0) throw new InvalidAutoDebitAmountForFixedException(amount);
+        if (amount == null || amount.signum() <= 0) {
+            throw new InvalidAutoDebitAmountForFixedException(amount);
+        }
     }
 }
