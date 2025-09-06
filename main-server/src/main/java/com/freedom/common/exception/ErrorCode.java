@@ -39,6 +39,11 @@ public enum ErrorCode {
     // 퀴즈 에러
     QUIZ_NOT_FOUND("QUIZ001", "퀴즈를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     QUIZ_VALIDATION_ERROR("QUIZ002", "퀴즈 데이터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    USER_QUIZ_NOT_FOUND("QUIZ003", "사용자 퀴즈를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    INVALID_QUIZ_ANSWER("QUIZ004", "유효하지 않은 퀴즈 답안입니다.", HttpStatus.BAD_REQUEST),
+    INSUFFICIENT_QUIZ("QUIZ005", "출제 가능한 퀴즈가 부족합니다.", HttpStatus.BAD_REQUEST),
+    INVALID_MCQ_OPTION("QUIZ006", "유효하지 않은 선택지입니다.", HttpStatus.BAD_REQUEST),
+    QUIZ_ALREADY_SUBMITTED("QUIZ007", "이미 답안이 제출된 퀴즈입니다.", HttpStatus.BAD_REQUEST),
 
     // 캐릭터 생성 에러
     CHARACTER_ALREADY_CREATED("CHAR001", "이미 캐릭터가 생성되었습니다.", HttpStatus.CONFLICT),
@@ -53,7 +58,10 @@ public enum ErrorCode {
     SAVING_PAYMENT_INVALID_PARAMS("SAV006", "납입 파라미터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
     SAVING_POLICY_INVALID("SAV007", "정책 파라미터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
     SAVING_SNAPSHOT_IDENTIFIERS_INVALID("SAV008", "스냅샷 식별자가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
-    SAVING_DUPLICATE_SUBSCRIPTION("SAV009", "이미 가입한 적금에 또 가입할 수 없습니다.", HttpStatus.BAD_REQUEST);
+    SAVING_DUPLICATE_SUBSCRIPTION("SAV009", "이미 가입한 적금에 또 가입할 수 없습니다.", HttpStatus.BAD_REQUEST),
+
+    // 스크랩 에러
+    SCRAP_ALREADY_EXISTS("SCRAP001", "이미 스크랩한 뉴스입니다.", HttpStatus.CONFLICT);
 
     private final String code;
     private final String message;

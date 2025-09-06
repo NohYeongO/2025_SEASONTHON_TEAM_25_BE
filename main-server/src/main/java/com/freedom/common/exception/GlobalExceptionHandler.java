@@ -1,10 +1,12 @@
 package com.freedom.common.exception;
 
 import com.freedom.common.exception.custom.*;
+import com.freedom.common.notification.DiscordWebhookClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,7 +22,10 @@ import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final DiscordWebhookClient discordWebhookClient;
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
@@ -38,6 +43,40 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleQuizNotFoundException(QuizNotFoundException e) {
         log.warn("퀴즈를 찾을 수 없음: {}", e.getMessage());
         return createErrorResponse(ErrorCode.QUIZ_NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserQuizNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserQuizNotFoundException(UserQuizNotFoundException e) {
+        log.warn("사용자 퀴즈를 찾을 수 없음: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.USER_QUIZ_NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidQuizAnswerException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidQuizAnswerException(InvalidQuizAnswerException e) {
+        log.warn("유효하지 않은 퀴즈 답안: {}", e.getMessage());
+
+        // 선택지 범위 오류인 경우 QUIZ006 코드 사용
+        if (e.getMessage().contains("유효하지 않은 선택지")) {
+            return createErrorResponse(ErrorCode.INVALID_MCQ_OPTION);
+        }
+
+        return createErrorResponse(ErrorCode.INVALID_QUIZ_ANSWER);
+    }
+
+    @ExceptionHandler(InsufficientQuizException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientQuizException(InsufficientQuizException e) {
+        log.warn("퀴즈 부족: {}", e.getMessage());
+        discordWebhookClient.sendErrorMessage(
+                "🚨 퀴즈 부족 오류",
+                "**오류 메시지:** " + e.getMessage()
+        );
+        return createErrorResponse(ErrorCode.INSUFFICIENT_QUIZ);
+    }
+
+    @ExceptionHandler(QuizAlreadySubmittedException.class)
+    public ResponseEntity<ErrorResponse> handleQuizAlreadySubmittedException(QuizAlreadySubmittedException e) {
+        log.warn("이미 답안 제출된 퀴즈: {}", e.getMessage());
+        return createErrorResponse(ErrorCode.QUIZ_ALREADY_SUBMITTED);
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
@@ -243,6 +282,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ErrorCode.CHARACTER_ALREADY_CREATED.getStatus())
                 .body(ErrorResponse.of(ErrorCode.CHARACTER_ALREADY_CREATED));
+    }
+
+    @ExceptionHandler(NewsScrapAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleNewsScrapAlreadyExistsException(NewsScrapAlreadyExistsException e) {
+        log.warn("이미 스크랩한 뉴스: userId={}, newsArticleId={}", e.getUserId(), e.getNewsArticleId());
+        return createErrorResponse(ErrorCode.SCRAP_ALREADY_EXISTS);
+    }
+
+    @ExceptionHandler(QuizScrapAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleQuizScrapAlreadyExistsException(QuizScrapAlreadyExistsException e) {
+        log.warn("이미 스크랩한 퀴즈: userId={}, userQuizId={}", e.getUserId(), e.getUserQuizId());
+        return createErrorResponse(ErrorCode.SCRAP_ALREADY_EXISTS);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
