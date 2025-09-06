@@ -122,7 +122,13 @@ public class SavingSubscriptionService {
         if (supported.size() == 1) {
             return supported.get(0);
         }
-        throw new MissingTermSelectionException(supported);
+        // 프론트에서 기간 선택 UI가 없을 때의 기본 정책
+        // 1) 12개월이 지원되면 12개월 선택, 2) 없으면 가장 짧은 기간 선택
+        if (supported.contains(12)) {
+            return 12;
+        }
+        int min = supported.stream().min(Integer::compareTo).orElseThrow(() -> new MissingTermSelectionException(supported));
+        return min;
     }
 
     private String normalizeReserveType(String reserveType) {
