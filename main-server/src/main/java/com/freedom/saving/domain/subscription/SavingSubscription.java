@@ -1,5 +1,6 @@
 package com.freedom.saving.domain.subscription;
 
+import com.freedom.common.exception.custom.SavingExceptions;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -57,7 +58,7 @@ public class SavingSubscription {
                                           TermMonths term,
                                           ServiceDates dates) {
         if (userId == null || productSnapshotId == null) {
-            throw new IllegalArgumentException("userId/productSnapshotId는 필수입니다.");
+            throw new SavingExceptions.SavingSnapshotIdentifiersInvalidException();
         }
         SavingSubscription s = new SavingSubscription();
         s.userId = userId;
@@ -89,7 +90,7 @@ public class SavingSubscription {
 
     private void ensureActive() {
         if (this.status != SubscriptionStatus.ACTIVE) {
-            throw new IllegalStateException("ACTIVE 상태에서만 전이할 수 있습니다. 현재=" + this.status);
+            throw new SavingExceptions.SavingSubscriptionInvalidStateException(this.status.name());
         }
     }
 }

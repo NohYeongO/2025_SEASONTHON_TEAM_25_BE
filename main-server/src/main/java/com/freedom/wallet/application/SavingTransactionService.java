@@ -144,6 +144,26 @@ public class SavingTransactionService {
     }
 
     /**
+     * 적금 자동 납입 처리 (멱등성 보장)
+     */
+    public WalletTransaction processSavingAutoDebit(Long userId, String requestId, BigDecimal amount, Long subscriptionId) {
+        if (transactionRepository.findByRequestId(requestId).isPresent()) {
+            return transactionRepository.findByRequestId(requestId).get();
+        }
+        UserWallet userWallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 지갑을 찾을 수 없습니다. userId: " + userId));
+        UserWallet wallet = transactionJpaAdapter.findWalletByIdWithLock(userWallet.getId())
+                .orElseThrow(() -> new IllegalArgumentException("지갑을 찾을 수 없습니다. ID: " + userWallet.getId()));
+
+        // 출금(잔액 부족 시 도메인에서 예외 발생)
+        wallet.withdraw(amount);
+        walletRepository.save(wallet);
+
+        WalletTransaction transaction = WalletTransaction.createSavingAutoDebit(wallet, requestId, amount, subscriptionId);
+        return transactionRepository.save(transaction);
+    }
+
+    /**
      * 요청 ID 생성 (UUID 기반)
      * @return 고유한 요청 ID
      */

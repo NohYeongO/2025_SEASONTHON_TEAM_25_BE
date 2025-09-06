@@ -107,7 +107,14 @@ public class WalletTransaction extends BaseEntity {
                      amount, "적금 이자", "SAVING_SUBSCRIPTION", subscriptionId);
     }
 
-
+    /**
+     * 거래 생성 팩토리 - 적금 자동 납입
+     */
+    public static WalletTransaction createSavingAutoDebit(UserWallet wallet, String requestId, BigDecimal amount,
+                                                          Long subscriptionId) {
+        return create(wallet, requestId, TransactionDirection.WITHDRAW, TransactionReasonCode.SAVING_AUTO_DEBIT,
+                amount, "적금 자동 납입", "SAVING_SUBSCRIPTION", subscriptionId);
+    }
 
     /**
      * 공통 거래 생성 메서드

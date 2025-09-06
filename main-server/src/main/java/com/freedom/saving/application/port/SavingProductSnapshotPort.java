@@ -20,4 +20,7 @@ public interface SavingProductSnapshotPort {
 
     /** (방어용) 기간/유형 조합이 실제 존재하는지 */
     boolean existsOption(Long productSnapshotId, int termMonths, String reserveTypeCode);
+
+    /** 가입 발생 시 인기 집계 증가 */
+    void incrementSubscriberCount(Long productSnapshotId);
 }

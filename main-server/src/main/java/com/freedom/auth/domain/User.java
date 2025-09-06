@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -33,6 +35,9 @@ public class User extends BaseEntity {
     
     @Column(name = "character_created", nullable = false)
     private Boolean characterCreated;
+
+    @Column(name = "last_auto_payment_date")
+    private LocalDate lastAutoPaymentDate;
     
     @Builder
     public User(String email, String password, UserRole role, UserStatus status) {
@@ -61,5 +66,9 @@ public class User extends BaseEntity {
     
     public boolean hasCharacterCreated() {
         return this.characterCreated;
+    }
+
+    public void updateLastAutoPaymentDate(LocalDate date) {
+        this.lastAutoPaymentDate = date;
     }
 }

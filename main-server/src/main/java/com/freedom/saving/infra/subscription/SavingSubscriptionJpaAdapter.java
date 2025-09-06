@@ -9,6 +9,8 @@ import com.freedom.saving.infra.snapshot.SavingSubscriptionJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.freedom.saving.domain.subscription.SubscriptionStatus;
+import com.freedom.common.exception.custom.SavingExceptions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,6 +36,11 @@ public class SavingSubscriptionJpaAdapter implements SavingSubscriptionPort {
                      BigDecimal autoDebitAmount,  // 정액식(S)일 땐 Service에서 필수 검증
                      LocalDate startServiceDate,
                      LocalDate maturityServiceDate) {
+
+        // 0) 중복 가입 방지: 동일 사용자/상품에 ACTIVE가 존재하면 예외
+        if (repository.existsByUserIdAndProductSnapshotIdAndStatus(userId, productSnapshotId, SubscriptionStatus.ACTIVE)) {
+            throw new SavingExceptions.SavingDuplicateSubscriptionException();
+        }
 
         // 1) VO 생성(기본 제약은 VO가 검증)
         TermMonths term = new TermMonths(termMonths);
