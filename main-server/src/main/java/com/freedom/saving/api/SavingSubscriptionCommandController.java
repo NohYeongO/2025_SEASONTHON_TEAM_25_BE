@@ -51,12 +51,12 @@ public class SavingSubscriptionCommandController {
     }
 
     @DeleteMapping("/{subscriptionId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancel(
+    public org.springframework.http.ResponseEntity<?> cancel(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @PathVariable Long subscriptionId
     ) {
         commandService.cancelByUser(principal.getId(), subscriptionId);
+        return org.springframework.http.ResponseEntity.ok(com.freedom.common.exception.SuccessResponse.ok("적금 해지가 완료되었습니다."));
     }
 
     @GetMapping("/maturity/pending")
